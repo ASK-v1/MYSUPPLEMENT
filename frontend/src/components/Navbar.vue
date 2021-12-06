@@ -1,30 +1,41 @@
 <template>
-  <div class="nav">
-    <router-link to="/" class="logo"><h1>LOGO</h1></router-link>
+  <div class="navbar">
+    <router-link to="/" class="logo"><img src="../assets/images/logo.png"></router-link>
+    <div class="account-cart">
+      <router-link to="/" class="sign">Sign In/Register</router-link>
+      <font-awesome-icon class="account" :icon="['fa', 'user']" size="lg" />
+      <font-awesome-icon class="cart" :icon="['fa', 'shopping-cart']" size="lg" />
+    </div>
   </div>
 </template>
 
 <style lang="scss">
 @import "../assets/style/index.scss";
 
-.nav {
+.navbar {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  margin: 50px;
+  background-color: black;
+  color: white;
 
   .logo {
+    margin-left: 40px;
+  }
+  .account-cart {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    color: $dark;
-    font-weight: 500;
-    font-size: 20px;
-    text-decoration: none;
+    flex-direction: row;
+    gap: 40px;
+    margin-right: 100px;
 
-    &:hover {
-      color: $secondary;
+    .sign {
+      text-decoration: none;
+      color: white;
+
+      &:hover {
+        color: $primary;
+      }
     }
   }
 }
