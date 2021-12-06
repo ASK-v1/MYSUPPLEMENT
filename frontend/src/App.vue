@@ -1,8 +1,12 @@
 <template>
-  <router-view/>
+  <div class="app">
+    <router-view />
+  </div>
 </template>
 
 <style lang="scss">
+@import "./assets/style/index.scss";
+
 * {
   margin: 0;
   padding: 0;

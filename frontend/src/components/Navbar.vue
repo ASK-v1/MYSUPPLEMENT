@@ -1,28 +1,30 @@
 <template>
   <div class="nav">
     <router-link to="/" class="logo"><h1>LOGO</h1></router-link>
-    <router-link to="/" class="login"><h1>Login</h1></router-link>
   </div>
 </template>
 
 <style lang="scss">
+@import "../assets/style/index.scss";
+
 .nav {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-between;
+  margin: 50px;
 
-  .logo, .login {
+  .logo {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: black;
+    color: $dark;
     font-weight: 500;
     font-size: 20px;
     text-decoration: none;
 
     &:hover {
-      color: gray;
+      color: $secondary;
     }
   }
 }
