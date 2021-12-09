@@ -1,10 +1,20 @@
-@import url("https://fonts.googleapis.com/css2?family=Nunito+Sans&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito+Sans&display=swap");
 
-$primary: #5000b5;
-$secondary: #5000b555;
+$primary-color: #5000b5;
+$primary-color-dark: #30005b;
+
+$secondary-color: #5100b535;
 $dark: rgba(0, 0, 0, 0.8);
 
 $base-solid: 1.5px;
 $base-radius: 15px;
-$base-shadow: 1px 2px 4px rgba(0, 0, 0, 0.2);
-$base-font-size: 1rem;
+$base-shadow: 1px 2px 4px rgba(0.1, 0.2, 0.4, 1.4);
+$base-padding: 15px;
+
+$base-font-xxxl: 3rem;
+$base-font-xxl: 2.4rem;
+$base-font-xl: 2rem;
+$base-font-l: 1.6rem;
+$base-font-m: 1.2rem;
+$base-font-s: 0.8rem;
+$base-font-xs: 0.4rem;
