@@ -125,7 +125,7 @@ const count = 0
           font-weight: 600;
           border-radius: $base-radius;
           width: 22px;
-          margin: -12px;
+          margin: -16px;
         }
       }
     }

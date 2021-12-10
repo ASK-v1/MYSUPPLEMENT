@@ -1,6 +1,9 @@
 <script lang="ts" setup>
 import Navbar from '../components/Navbar.vue'
+import Banner from '../components/Banner.vue'
+import Best from '../components/Best.vue'
 import Content from '../components/Content.vue'
+import Footer from '../components/Footer.vue'
 </script>
 
 <template>
@@ -9,7 +12,16 @@ import Content from '../components/Content.vue'
       <Navbar />
     </div>
     <div class="home-content">
+      <Banner />
+    </div>
+    <div class="home-best">
+      <Best />
+    </div>
+    <div class="home-content">
       <Content />
+    </div>
+    <div class="home-footer">
+      <Footer />
     </div>
   </div>
 </template>
