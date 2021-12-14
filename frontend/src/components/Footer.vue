@@ -1,13 +1,13 @@
 <template>
   <div class="footer">
     <div class="social">
-      <img src="../assets/images/twitter.png" height="50px">
-      <img src="../assets/images/instagram.png" height="50px">
-      <img src="../assets/images/facebook.png" height="50px">
-      <img src="../assets/images/youtube.png" height="50px">
+      <img src="../assets/images/twitter.png" height="50px" />
+      <img src="../assets/images/instagram.png" height="50px" />
+      <img src="../assets/images/facebook.png" height="50px" />
+      <img src="../assets/images/youtube.png" height="50px" />
     </div>
     <div class="text">
-      <p>© 2021 MYSUPPLEMENT All rights reserved.</p>
+      <p>© 2021 proteinplus All rights reserved.</p>
     </div>
   </div>
 </template>
@@ -16,7 +16,12 @@
 @import "../assets/style/index.scss";
 
 .footer {
-  background-image: linear-gradient(66deg, #ff7171 3%, #C850C0 33%, #FFCC70 99%);
+  background-image: linear-gradient(
+    66deg,
+    #ff7171 3%,
+    #c850c0 33%,
+    #ffcc70 99%
+  );
   padding: 50px;
   gap: 50px;
   display: flex;

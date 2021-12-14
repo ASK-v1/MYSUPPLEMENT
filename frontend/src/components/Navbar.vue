@@ -1,31 +1,37 @@
 <script lang="ts" setup>
-const count = 0
-
+import { ref } from 'vue'
+const count = ref(0)
+const search = ref('')
 </script>
 
 <template>
   <div class="navbar">
     <div class="upper">
-      <router-link to="/" class="logo">MYSUPPLEMENT</router-link>
+      <router-link to="/" class="logo">
+        <img src="../assets/images/logo.png" />
+      </router-link>
       <div class="search">
         <el-autocomplete
           class="search-input"
-          v-model="state"
-          :fetch-suggestions="querySearchAsync"
+          v-model="search"
           placeholder="Search for Product"
           :trigger-on-focus="false"
-          @select="handleSelect"
           size="large"
         />
         <div class="search-icon">
-          <router-link to="/" class="search-buttton" ><font-awesome-icon :icon="['fa', 'search']" size="lg" /></router-link>
+          <router-link to="/" class="search-buttton"></router-link>
+          <font-awesome-icon :icon="['fa', 'search']" size="lg" />
         </div>
       </div>
       <div class="account-cart">
-        <router-link to="/" class="sign">Sign In/Register</router-link>
-        <router-link to="/" class="account"><font-awesome-icon :icon="['fa', 'user']" size="lg" /></router-link>
+        <router-link to="/account" class="sign">Sign In/Register</router-link>
+        <router-link to="/" class="account">
+          <font-awesome-icon :icon="['fa', 'user']" size="lg" />
+        </router-link>
         <div class="cart-icon">
-          <router-link to="/" class="cart"><font-awesome-icon :icon="['fa', 'shopping-cart']" size="lg" /></router-link>
+          <router-link to="/" class="cart">
+            <font-awesome-icon :icon="['fa', 'shopping-cart']" size="lg" />
+          </router-link>
           <div class="cart-count">
             <p>{{ count }}</p>
           </div>
@@ -63,13 +69,17 @@ const count = 0
     .logo {
       text-decoration: none;
       color: white;
-      font-family: 'Lilita One', cursive;
+      font-family: "Lilita One", cursive;
       padding: $base-padding;
       font-size: $base-font-xl;
+
+      img {
+        width: 200px;
+      }
     }
     .search {
       display: inline-flex;
-      justify-content:flex-end;
+      justify-content: flex-end;
       align-items: center;
 
       .search-input {
@@ -79,12 +89,9 @@ const count = 0
       .search-icon {
         position: absolute;
         display: flex;
-        color: $primary-color;
+        color: black;
         padding: 10px;
-
-        & > :hover {
-          color: $primary-color-dark;
-        }
+        cursor: pointer;
       }
     }
 
@@ -133,7 +140,7 @@ const count = 0
 
   .navbar-buttons {
     display: flex;
-    justify-content:center;
+    justify-content: center;
     border-bottom: 1px solid #cccccc;
 
     .buttons {
@@ -148,7 +155,7 @@ const count = 0
         font-weight: 600;
 
         &:hover {
-          background-color:$primary-color;
+          background-color: $primary-color;
           color: white;
           padding: $base-padding;
           cursor: pointer;

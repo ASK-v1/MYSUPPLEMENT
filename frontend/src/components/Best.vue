@@ -11,9 +11,11 @@ const value = ref(3.7)
         <h1>BESTSELLERS</h1>
       </div>
       <div class="best-product-first">
-        <div v-for="best in bestsellersFirst" v-bind:key="best" class="product-first">
+        <div v-for="best in bestsellersFirst" :key="best.price" class="product-first">
           <div class="image">
-            <router-link to="/"><img :src="best.url"></router-link>
+            <router-link to="/">
+              <img :src="best.url" />
+            </router-link>
           </div>
           <div class="product-title">
             <h2>{{ best.title }}</h2>
@@ -36,9 +38,11 @@ const value = ref(3.7)
         </div>
       </div>
       <div class="best-product-second">
-        <div v-for="best in bestsellersSecond" v-bind:key="best" class="product-second">
+        <div v-for="best in bestsellersSecond" :key="best.price" class="product-second">
           <div class="image">
-            <router-link to="/"><img :src="best.url"></router-link>
+            <router-link to="/">
+              <img :src="best.url" />
+            </router-link>
           </div>
           <div class="product-title">
             <h2>{{ best.title }}</h2>
@@ -67,70 +71,72 @@ const value = ref(3.7)
 <style lang="scss">
 @import "../assets/style/index.scss";
 
-  .best {
-    margin-bottom: 200px;
-    margin-top: 200px;
+.best {
+  margin-bottom: 200px;
+  margin-top: 100px;
 
-    .best-seller {
+  .best-seller {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 50px;
+
+    .best-title {
+      background-color: rgb(0, 0, 0);
+      color: white;
+      font-family: "Lilita One", cursive;
+      font-size: $base-font-m;
+      padding: $base-padding;
+    }
+
+    .best-product-first {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 50px;
-
-      .best-title {
-        background-color: rgb(0, 0, 0);
-        color: white;
-        font-family: 'Lilita One', cursive;
-        font-size: $base-font-m;
-        padding: $base-padding;
-      }
-
-      .best-product-first {
-        display:flex;
-        text-align: center;
-        gap: 10px;
-        .product-first {
-          display: flex;
-          flex-direction: column;
-          flex: 1;
-          gap: 10px;
-        }
-      }
-
-      .best-product-second {
+      text-align: center;
+      gap: 10px;
+      .product-first {
         display: flex;
-        text-align: center;
+        flex-direction: column;
         flex: 1;
         gap: 10px;
-        .product-second {
-          display: flex;
-          flex-direction: column;
-          flex: 1;
-          gap: 10px;
-        }
       }
+    }
 
-      .product-title, .product-price {
-        font-size: $base-font-s;
+    .best-product-second {
+      display: flex;
+      text-align: center;
+      flex: 1;
+      gap: 10px;
+      .product-second {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        gap: 10px;
       }
+    }
 
-      .add-cart {
-        color: white;
-        text-decoration: none;
-        padding: 20px;
-        font-size: $base-font-m;
-        box-shadow: $base-shadow;
-        background-color: $primary-color;
-        font-family: 'Nunito Sans', sans-serif;
-        border: none;
-        font-weight: 600;
+    .product-title,
+    .product-price {
+      font-size: $base-font-s;
+    }
 
-        &:hover {
-          background-color: $primary-color-dark;
-          transition: all 0.3s ease-in-out 0s;
-          cursor: pointer;
-        }
+    .add-cart {
+      color: white;
+      text-decoration: none;
+      padding: 20px;
+      font-size: $base-font-m;
+      box-shadow: $base-shadow;
+      background-color: $primary-color;
+      font-family: "Nunito Sans", sans-serif;
+      border: none;
+      font-weight: 600;
+      margin-bottom: 20px;
+
+      &:hover {
+        background-color: $primary-color-dark;
+        transition: all 0.3s ease-in-out 0s;
+        cursor: pointer;
       }
     }
   }
+}
 </style>
