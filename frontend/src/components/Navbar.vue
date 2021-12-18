@@ -24,8 +24,8 @@ const search = ref('')
         </div>
       </div>
       <div class="account-cart">
-        <router-link to="/account" class="sign">Sign In/Register</router-link>
-        <router-link to="/" class="account">
+        <router-link to="/signin" class="sign">Sign In/Register</router-link>
+        <router-link to="/account" class="account">
           <font-awesome-icon :icon="['fa', 'user']" size="lg" />
         </router-link>
         <div class="cart-icon">

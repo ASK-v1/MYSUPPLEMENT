@@ -1,30 +1,44 @@
 <script lang="ts" setup>
+import Navbar from '../components/Navbar.vue'
 import { ref } from 'vue'
 
-const email = ref('')
+const firstName = ref('')
+const lastName = ref('')
 const password = ref('')
+const email = ref('')
 </script>
 
 <template>
-  <div class="signin">
-    <div class="signin-title">
-      <h1>SIGN IN</h1>
+  <div class="register-navbar">
+    <Navbar />
+  </div>
+  <div class="register">
+    <div class="register-title">
+      <h1>REGISTER</h1>
     </div>
-    <div class="signin-main">
-      <form class="signin-form" action="submit">
-        <div class="signin-email">
+    <div class="register-main">
+      <form class="register-form" action="submit">
+        <div class="register-firstname">
+          <label for="firstname">First Name:</label>
+          <el-input type="text" v-model="firstName" required />
+        </div>
+        <div class="register-lastname">
+          <label for="lastname">Last Name:</label>
+          <el-input type="text" v-model="lastName" required />
+        </div>
+        <div class="register-email">
           <label for="email">Email:</label>
           <el-input v-model="email" required />
         </div>
-        <div class="signin-password">
+        <div class="register-password">
           <label for="password">Password:</label>
           <el-input v-model="password" show-password required />
         </div>
-        <button class="signin-button">SIGN IN</button>
+        <button class="register-button">REGISTER</button>
       </form>
-      <div class="not-registered">
-        <p>Not registered?</p>
-        <button>Create an account</button>
+      <div class="have-account">
+        <p>Already have an account?</p>
+        <router-link to="signin">Sign in</router-link>
       </div>
     </div>
   </div>
@@ -33,20 +47,19 @@ const password = ref('')
 <style lang="scss">
 @import "../assets/style/index.scss";
 
-.signin {
+.register {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 100px 0 calc(50% - 500px) 0;
   background-image: linear-gradient(
     66deg,
     #ff7171 3%,
     #c850c0 33%,
     #ffcc70 99%
   );
-  padding-top: 100px;
-  padding-bottom: 400px;
 
-  .signin-title {
+  .register-title {
     background-color: rgb(0, 0, 0);
     color: white;
     font-family: "Lilita One", cursive;
@@ -55,24 +68,26 @@ const password = ref('')
     margin-bottom: 50px;
   }
 
-  .signin-main {
+  .register-main {
     box-shadow: $base-shadow;
     padding: 50px;
     background-color: white;
 
-    .signin-form {
+    .register-form {
       display: flex;
       flex-direction: column;
       gap: 20px;
 
-      .signin-email,
-      .signin-password {
+      .register-email,
+      .register-password,
+      .register-lastname,
+      .register-firstname {
         display: flex;
         flex-direction: column;
         gap: 10px;
       }
 
-      .signin-button {
+      .register-button {
         background-color: $primary-color;
         color: white;
         border: none;
@@ -90,8 +105,7 @@ const password = ref('')
         }
       }
     }
-
-    .not-registered {
+    .have-account {
       display: flex;
       flex-direction: row;
       gap: 10px;
