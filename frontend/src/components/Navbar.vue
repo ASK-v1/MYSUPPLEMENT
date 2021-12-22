@@ -1,7 +1,18 @@
 <script lang="ts" setup>
+import { product } from '../cart'
 import { ref } from 'vue'
-const count = ref(0)
+
 const search = ref('')
+
+const cd = ref(false)
+const count = ref(1)
+const num = ref(1)
+
+const subtotal = ref(product.price)
+const priceNum = () => {
+  subtotal.value = product.price * num.value
+}
+
 </script>
 
 <template>
@@ -29,10 +40,10 @@ const search = ref('')
           <font-awesome-icon :icon="['fa', 'user']" size="lg" />
         </router-link>
         <div class="cart-icon">
-          <router-link to="/" class="cart">
+          <a @click="cd = true" class="cart">
             <font-awesome-icon :icon="['fa', 'shopping-cart']" size="lg" />
-          </router-link>
-          <div class="cart-count">
+          </a>
+          <div @click="cd = true" class="cart-count">
             <p>{{ count }}</p>
           </div>
         </div>
@@ -49,6 +60,47 @@ const search = ref('')
       </div>
     </div>
   </div>
+  <el-drawer
+    size="20%"
+    lock-scroll="false"
+    custom-class="cart-drawer"
+    show-close="false"
+    v-model="cd"
+  >
+    <div class="cart-drawer-body">
+      <div class="cart-drawer-title-close">
+        <div class="cart-drawer-title">
+          <h1>YOUR ORDER</h1>
+        </div>
+        <div class="cart-drawer-close" @click="cd = !cd">x</div>
+      </div>
+      <div class="cart-drawer-products">
+        <img :src="product.image" width="80" height="80" />
+        <div class="cart-drawer-products-title-price-info-number">
+          <div class="cart-drawer-products-title">{{ product.title }}</div>
+          <div class="cart-drawer-products-info">{{ product.info }}</div>
+          <div class="cart-drawer-products-price">${{ product.price }}</div>
+          <el-input-number @click="priceNum" v-model="num" :min="1" :max="10" size="mini" />
+        </div>
+        <div class="cart-drawer-products-delete">x</div>
+      </div>
+      <div class="cart-drawer-lower">
+        <div class="subtotal">
+          <div class="subtotal-title">
+            <h2>SUBTOTAL</h2>
+          </div>
+          <div class="subtotal-price">
+            <h3>${{ subtotal }}</h3>
+          </div>
+        </div>
+        <div class="view-button">
+          <router-link class="view-button-cart" to="/cart">
+            <h2>VIEW CART</h2>
+          </router-link>
+        </div>
+      </div>
+    </div>
+  </el-drawer>
 </template>
 
 <style lang="scss">
@@ -120,6 +172,7 @@ const search = ref('')
 
         .cart {
           color: white;
+          cursor: pointer;
         }
 
         .cart-count {
@@ -133,6 +186,7 @@ const search = ref('')
           border-radius: $base-radius;
           width: 22px;
           margin: -16px;
+          cursor: pointer;
         }
       }
     }
@@ -161,6 +215,135 @@ const search = ref('')
           cursor: pointer;
           transition: all 0.3s ease-in-out 0s;
         }
+      }
+    }
+  }
+}
+.cart-drawer {
+  &-body {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 20%;
+    background-color: white;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+
+    .cart-drawer-title-close {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 25px;
+
+      .cart-drawer-title {
+        background-color: black;
+        padding: $base-padding;
+        color: white;
+        margin-left: 10px;
+        font-size: $base-font-m;
+        font-family: "Lilita One", cursive;
+      }
+
+      .cart-drawer-close {
+        font-size: 25px;
+        border-radius: 25px;
+        background-color: black;
+        height: 39px;
+        width: 39px;
+        text-align: center;
+        color: white;
+        font-weight: bolder;
+        cursor: pointer;
+        margin-right: 10px;
+
+        &:hover {
+          padding: 2px;
+          margin-right: 8px;
+          background-color: $dark;
+          transition: all 0.2s ease-in-out 0s;
+        }
+      }
+    }
+    .cart-drawer-lower {
+      display: inline-flex;
+      flex-direction: column;
+      background-color: $primary-color;
+      width: 100%;
+      height: 150px;
+      padding: 30px 0 30px 0;
+      bottom: 0;
+      gap: 50px;
+      position: absolute;
+
+      .subtotal {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        color: white;
+        font-weight: 600;
+        font-size: $base-font-m;
+        font-family: "Lilita One", cursive;
+        margin: 0 20px 0 20px;
+      }
+
+      .view-button {
+        display: flex;
+        justify-content: center;
+        &-cart {
+          color: rgb(0, 0, 0);
+          padding: $base-padding;
+          font-size: $base-font-s;
+          box-shadow: $base-shadow;
+          font-weight: bold;
+          border: 1px solid black;
+          width: 150px;
+          background-color: rgb(255, 255, 255);
+          cursor: pointer;
+          text-align: center;
+          text-decoration: none;
+
+          &:hover {
+            background-color: rgb(200, 200, 200);
+            transition: all 0.3s ease-in-out 0s;
+          }
+        }
+      }
+    }
+    .cart-drawer-products {
+      margin-top: 50px;
+      display: flex;
+      padding: 20px 0 20px 0;
+      flex-direction: row;
+      justify-content: space-between;
+      border-top: 1px solid rgb(200, 200, 200);
+      border-bottom: 1px solid rgb(200, 200, 200);
+
+      &-title-price-info-number {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+
+        .cart-drawer-products-title,
+        .cart-drawer-products-price {
+          font-weight: 600;
+        }
+      }
+      &-delete {
+        font-size: 17px;
+        border-radius: 17px;
+        background-color: $primary-color;
+        height: 26px;
+        width: 26px;
+        text-align: center;
+        color: white;
+        font-weight: bolder;
+        cursor: pointer;
+        margin-right: 10px;
       }
     }
   }

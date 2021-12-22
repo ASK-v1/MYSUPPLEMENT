@@ -3,6 +3,8 @@ import Home from '../views/Home.vue'
 import Account from '../views/Account.vue'
 import Signin from '../views/Signin.vue'
 import Register from '../views/Register.vue'
+import Cart from '../views/Cart.vue'
+
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
@@ -23,6 +25,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/register',
     name: 'Register',
     component: Register
+  },
+  {
+    path: '/cart',
+    name: 'Cart',
+    component: Cart
   }
 ]
 

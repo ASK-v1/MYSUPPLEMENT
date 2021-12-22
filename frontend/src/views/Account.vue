@@ -82,9 +82,9 @@ const switchAddresses = () => {
       text-decoration: none;
       font-size: $base-font-s;
       padding: $base-padding;
-      font-weight: 600;
-      border-radius: $base-radius;
-      border: 1px solid $dark;
+      border-radius: 5px;
+      border: none;
+      font-weight: bold;
 
       &:hover {
         background-color: rgba(0, 0, 0);
