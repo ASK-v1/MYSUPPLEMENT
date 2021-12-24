@@ -22,12 +22,12 @@ const active = ref(1)
     </div>
     <div class="cart-body">
       <div class="cart-body-title">
-        <h1>YOUR SHOPPING CART</h1>
+        <h1>SHOPPING CART</h1>
       </div>
       <div class="cart-body-items">
         <div class="cart-body-items-left">
           <div class="cart-body-items-left-image">
-            <img :src="product.image" width="160" />
+            <img :src="product.image" width="160" height="160" />
           </div>
           <div class="cart-body-items-left-title-info">
             <div class="cart-body-items-left-title">
@@ -38,8 +38,14 @@ const active = ref(1)
           <div class="cart-body-items-left-number">
             <el-input-number v-model="num" :min="1" :max="10" size="large" />
           </div>
-          <div class="cart-body-items-left-total">${{ product.price }}</div>
-          <div class="cart-body-items-left-delete">x</div>
+          <div class="cart-body-items-left-total">
+            <h3>${{ product.price }}</h3>
+          </div>
+          <font-awesome-icon
+            class="cart-body-items-left-delete"
+            :icon="['fa', 'trash-alt']"
+            color="#5000b5"
+          />
         </div>
         <div class="cart-body-items-right">
           <div class="cart-body-items-right-overview">
@@ -59,7 +65,7 @@ const active = ref(1)
             <h4>$78.99</h4>
           </div>
           <div class="cart-body-items-right-buttons">
-            <router-link class="checkout" to="/cart">
+            <router-link class="checkout" to="/address">
               <h2>PROCEED TO CHECKOUT</h2>
             </router-link>
             <router-link class="continue" to="/">
@@ -86,7 +92,7 @@ const active = ref(1)
   &-body {
     display: flex;
     flex-direction: column;
-    margin: 50px 0 250px 0;
+    margin: 50px 0px 300px 0px;
     align-items: center;
 
     &-title {
@@ -101,14 +107,14 @@ const active = ref(1)
 
     &-items {
       display: flex;
-      gap: 300px;
+      gap: 222px;
       align-items: flex-start;
 
       &-left {
         display: flex;
         flex-direction: row;
         align-items: center;
-        gap: 50px;
+        gap: 30px;
 
         &-title-info {
           display: flex;
@@ -117,22 +123,18 @@ const active = ref(1)
         }
 
         &-delete {
-          font-size: 17px;
-          border-radius: 17px;
-          background-color: $primary-color;
-          height: 26px;
-          width: 26px;
-          text-align: center;
-          color: white;
-          font-weight: bolder;
+          font-size: 25px;
           cursor: pointer;
+          &:hover {
+            color: $primary-color-dark;
+          }
         }
       }
 
       &-right {
         display: flex;
         flex-direction: column;
-        gap: 50px;
+        gap: 30px;
 
         &-overview,
         &-ordertotal {
@@ -156,6 +158,7 @@ const active = ref(1)
           flex-direction: column;
           justify-content: space-between;
           gap: 30px;
+          margin-top: 30px;
 
           .checkout {
             color: rgb(255, 255, 255);

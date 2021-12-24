@@ -77,7 +77,7 @@ const state = reactive({
   background-color: $primary-color;
   color: white;
   border: none;
-  width: 200px;
+  width: 280px;
   height: 50px;
   font-size: $base-font-m;
   font-weight: 600;

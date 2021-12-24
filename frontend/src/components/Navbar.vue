@@ -82,7 +82,11 @@ const priceNum = () => {
           <div class="cart-drawer-products-price">${{ product.price }}</div>
           <el-input-number @click="priceNum" v-model="num" :min="1" :max="10" size="mini" />
         </div>
-        <div class="cart-drawer-products-delete">x</div>
+        <font-awesome-icon
+          class="cart-drawer-products-delete"
+          :icon="['fa', 'trash-alt']"
+          color="#5000b5"
+        />
       </div>
       <div class="cart-drawer-lower">
         <div class="subtotal">
@@ -334,16 +338,14 @@ const priceNum = () => {
         }
       }
       &-delete {
-        font-size: 17px;
-        border-radius: 17px;
-        background-color: $primary-color;
-        height: 26px;
-        width: 26px;
         text-align: center;
-        color: white;
-        font-weight: bolder;
+        margin-right: 20px;
+        font-size: 20px;
         cursor: pointer;
-        margin-right: 10px;
+        margin-top: 20px;
+        &:hover {
+          color: $primary-color-dark;
+        }
       }
     }
   }
