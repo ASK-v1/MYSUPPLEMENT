@@ -8,6 +8,7 @@ import Address from '../views/Address.vue'
 import Payment from '../views/Payment.vue'
 import Products from '../views/Products.vue'
 import Product from '../views/Product.vue'
+import Admin from '../views/Admin.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -54,6 +55,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/product',
     name: 'Product',
     component: Product
+  },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: Admin
   }
 ]
 
