@@ -13,8 +13,8 @@ const value = ref(3.7)
       <div class="best-product-first">
         <div v-for="best in bestsellersFirst" :key="best.price" class="product-first">
           <div class="image">
-            <router-link to="/">
-              <img :src="best.url" />
+            <router-link to="/product">
+              <img :src="best.url" width="260" />
             </router-link>
           </div>
           <div class="product-title">
@@ -40,8 +40,8 @@ const value = ref(3.7)
       <div class="best-product-second">
         <div v-for="best in bestsellersSecond" :key="best.price" class="product-second">
           <div class="image">
-            <router-link to="/">
-              <img :src="best.url" />
+            <router-link to="/product">
+              <img :src="best.url" width="260" />
             </router-link>
           </div>
           <div class="product-title">
@@ -92,11 +92,11 @@ const value = ref(3.7)
     .best-product-first {
       display: flex;
       text-align: center;
-      gap: 10px;
+      gap: 50px;
+
       .product-first {
         display: flex;
         flex-direction: column;
-        flex: 1;
         gap: 10px;
       }
     }
@@ -104,12 +104,11 @@ const value = ref(3.7)
     .best-product-second {
       display: flex;
       text-align: center;
-      flex: 1;
-      gap: 10px;
+      gap: 50px;
+
       .product-second {
         display: flex;
         flex-direction: column;
-        flex: 1;
         gap: 10px;
       }
     }

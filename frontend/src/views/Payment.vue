@@ -217,7 +217,7 @@ const checked1 = ref('')
           padding: $base-padding;
           font-size: $base-font-s;
           font-weight: bold;
-          width: 450px;
+          width: 475px;
           background-color: rgb(0, 0, 0);
           cursor: pointer;
           text-align: center;

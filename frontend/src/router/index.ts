@@ -6,6 +6,8 @@ import Register from '../views/Register.vue'
 import Cart from '../views/Cart.vue'
 import Address from '../views/Address.vue'
 import Payment from '../views/Payment.vue'
+import Products from '../views/Products.vue'
+import Product from '../views/Product.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -42,6 +44,16 @@ const routes: Array<RouteRecordRaw> = [
     path: '/address',
     name: 'Address',
     component: Address
+  },
+  {
+    path: '/products',
+    name: 'Products',
+    component: Products
+  },
+  {
+    path: '/product',
+    name: 'Product',
+    component: Product
   }
 ]
 

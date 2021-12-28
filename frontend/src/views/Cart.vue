@@ -4,7 +4,7 @@ import Footer from '../components/Footer.vue'
 import { product } from '../cart'
 import { ref } from 'vue'
 
-const num = ref(1)
+const qty = ref(1)
 const active = ref(1)
 </script>
 
@@ -35,8 +35,8 @@ const active = ref(1)
             </div>
             <div class="cart-body-items-left-info">{{ product.info }}</div>
           </div>
-          <div class="cart-body-items-left-number">
-            <el-input-number v-model="num" :min="1" :max="10" size="large" />
+          <div class="cart-body-items-left-qty">
+            <el-input-number v-model="qty" :min="1" :max="10" size="large" />
           </div>
           <div class="cart-body-items-left-total">
             <h3>${{ product.price }}</h3>

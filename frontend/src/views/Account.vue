@@ -85,6 +85,7 @@ const switchAddresses = () => {
       border-radius: 5px;
       border: none;
       font-weight: bold;
+      width: 200px;
 
       &:hover {
         background-color: rgba(0, 0, 0);

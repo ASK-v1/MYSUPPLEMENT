@@ -6,11 +6,11 @@ const search = ref('')
 
 const cd = ref(false)
 const count = ref(1)
-const num = ref(1)
+const qty = ref(1)
 
 const subtotal = ref(product.price)
-const priceNum = () => {
-  subtotal.value = product.price * num.value
+const price = () => {
+  subtotal.value = product.price * qty.value
 }
 
 </script>
@@ -51,12 +51,12 @@ const priceNum = () => {
     </div>
     <div class="navbar-buttons">
       <div class="buttons">
-        <router-link to="/" class="nav-button">PROTEIN</router-link>
-        <router-link to="/" class="nav-button">VITAMINS</router-link>
-        <router-link to="/" class="nav-button">ENERGY</router-link>
-        <router-link to="/" class="nav-button">CREATINE</router-link>
-        <router-link to="/" class="nav-button">AMINO ACIDS</router-link>
-        <router-link to="/" class="nav-button">MUSCLE BOOSTERS</router-link>
+        <router-link to="/products" class="nav-button">PROTEIN</router-link>
+        <router-link to="/products" class="nav-button">VITAMINS</router-link>
+        <router-link to="/products" class="nav-button">ENERGY</router-link>
+        <router-link to="/products" class="nav-button">CREATINE</router-link>
+        <router-link to="/products" class="nav-button">AMINO ACIDS</router-link>
+        <router-link to="/products" class="nav-button">MUSCLE BOOSTERS</router-link>
       </div>
     </div>
   </div>
@@ -76,11 +76,11 @@ const priceNum = () => {
       </div>
       <div class="cart-drawer-products">
         <img :src="product.image" width="80" height="80" />
-        <div class="cart-drawer-products-title-price-info-number">
+        <div class="cart-drawer-products-title-price-info-qty">
           <div class="cart-drawer-products-title">{{ product.title }}</div>
           <div class="cart-drawer-products-info">{{ product.info }}</div>
           <div class="cart-drawer-products-price">${{ product.price }}</div>
-          <el-input-number @click="priceNum" v-model="num" :min="1" :max="10" size="mini" />
+          <el-input-number @click="price" v-model="qty" :min="1" :max="10" size="mini" />
         </div>
         <font-awesome-icon
           class="cart-drawer-products-delete"
@@ -325,7 +325,7 @@ const priceNum = () => {
       border-top: 1px solid rgb(200, 200, 200);
       border-bottom: 1px solid rgb(200, 200, 200);
 
-      &-title-price-info-number {
+      &-title-price-info-qty {
         display: flex;
         flex-direction: column;
         justify-content: center;

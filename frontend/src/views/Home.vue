@@ -4,6 +4,12 @@ import Banner from '../components/Banner.vue'
 import Best from '../components/Best.vue'
 import Content from '../components/Content.vue'
 import Footer from '../components/Footer.vue'
+import { onMounted } from 'vue'
+
+onMounted(() => {
+  window.scrollTo(0, 0)
+})
+
 </script>
 
 <template>
@@ -27,7 +33,7 @@ import Footer from '../components/Footer.vue'
 </template>
 
 <style lang="scss">
-  .home-best {
-    margin-top: 5%;
-  }
+.home-best {
+  margin-top: 5%;
+}
 </style>
