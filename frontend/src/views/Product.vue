@@ -1,13 +1,10 @@
-<script lang="ts" setup>
+<script setup>
 import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/Footer.vue'
 import Reviews from '@/components/Reviews.vue'
-import { ref, onMounted } from 'vue'
-import { product } from '../cart'
+import { ref } from 'vue'
 
-onMounted(() => {
-  window.scrollTo(0, 0)
-})
+window.scrollTo(0, 0)
 
 const rating = ref(3.7)
 const qty = ref(1)

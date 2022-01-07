@@ -1,8 +1,10 @@
-<script lang="ts" setup>
+<script setup>
 import Navbar from '../components/Navbar.vue'
 import Footer from '../components/Footer.vue'
-import { product } from '../cart'
 import { ref } from 'vue'
+import store from '../store'
+
+store.state.step = 'cart'
 
 const qty = ref(1)
 const active = ref(1)

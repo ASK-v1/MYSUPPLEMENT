@@ -1,9 +1,28 @@
-<script lang="ts" setup>
+<script setup>
 import Navbar from '../components/Navbar.vue'
 import { ref } from 'vue'
+import store from '../store'
+import router from '../router'
 
 const email = ref('')
 const password = ref('')
+
+const showError = ref(false)
+
+const login = async () => {
+  const user = {
+    email: email.value,
+    password: password.value
+  }
+  try {
+    await store.dispatch('loginUser', user)
+    if (store.state.userData.email === 'admin@gmail.com') router.push('admin')
+    else router.push('/')
+  } catch (error) {
+    showError.value = true
+    console.log(error)
+  }
+}
 </script>
 
 <template>
@@ -15,7 +34,8 @@ const password = ref('')
       <h1>SIGN IN</h1>
     </div>
     <div class="signin-main">
-      <form class="signin-form" action="submit">
+      <el-alert class="error" v-if="this.showError" title="Incorrect email or password" type="error" effect="dark"> </el-alert>
+      <form class="signin-form" @submit.prevent="login">
         <div class="signin-email">
           <label for="email">Email:</label>
           <el-input v-model="email" required />
@@ -24,7 +44,7 @@ const password = ref('')
           <label for="password">Password:</label>
           <el-input v-model="password" show-password required />
         </div>
-        <button class="signin-button">SIGN IN</button>
+        <button class="signin-button" type="submit">SIGN IN</button>
       </form>
       <div class="not-registered">
         <p>Not registered?</p>
@@ -62,6 +82,10 @@ const password = ref('')
     box-shadow: $base-shadow;
     padding: 50px;
     background-color: white;
+
+    .error {
+      margin-bottom: 30px;
+    }
 
     .signin-form {
       display: flex;

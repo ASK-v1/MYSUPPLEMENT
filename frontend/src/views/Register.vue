@@ -1,11 +1,31 @@
-<script lang="ts" setup>
+<script setup>
 import Navbar from '../components/Navbar.vue'
 import { ref } from 'vue'
+import store from '../store'
+import router from '../router'
 
 const firstName = ref('')
 const lastName = ref('')
 const password = ref('')
 const email = ref('')
+
+const showError = ref(false)
+
+const register = async () => {
+  const user = {
+    firstName: firstName.value,
+    lastName: lastName.value,
+    password: password.value,
+    email: email.value
+  }
+  try {
+    await store.dispatch('registerUser', user)
+    router.push('signin')
+  } catch (error) {
+    showError.value = true
+    console.log(error)
+  }
+}
 </script>
 
 <template>
@@ -17,14 +37,15 @@ const email = ref('')
       <h1>REGISTER</h1>
     </div>
     <div class="register-main">
-      <form class="register-form" action="submit">
+      <el-alert class="error" v-if="this.showError" title="Email is invalid or already taken" type="error" effect="dark"> </el-alert>
+      <form class="register-form" @submit.prevent="register">
         <div class="register-firstname">
           <label for="firstname">First Name:</label>
-          <el-input type="text" v-model="firstName" required />
+          <el-input v-model="firstName" required />
         </div>
         <div class="register-lastname">
           <label for="lastname">Last Name:</label>
-          <el-input type="text" v-model="lastName" required />
+          <el-input v-model="lastName" required />
         </div>
         <div class="register-email">
           <label for="email">Email:</label>
@@ -34,7 +55,7 @@ const email = ref('')
           <label for="password">Password:</label>
           <el-input v-model="password" show-password required />
         </div>
-        <button class="register-button">REGISTER</button>
+        <button type="submit" class="register-button">REGISTER</button>
       </form>
       <div class="have-account">
         <p>Already have an account?</p>
@@ -72,6 +93,10 @@ const email = ref('')
     box-shadow: $base-shadow;
     padding: 50px;
     background-color: white;
+
+    .error {
+      margin-bottom: 30px;
+    }
 
     .register-form {
       display: flex;

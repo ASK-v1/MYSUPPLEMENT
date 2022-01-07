@@ -1,18 +1,9 @@
-<script lang="ts" setup>
+<script setup>
 import { ref, reactive } from 'vue'
+import store from '../store'
+import router from '../router'
 
-const state = reactive({
-  dialogFormVisible: false,
-  form: {
-    Brand: '',
-    Name: '',
-    Price: '',
-    Flavor: '',
-    Qty: '',
-    Info: ''
-  },
-  formLabelWidth: '100px'
-})
+(store.state.userData.email === 'admin@gmail.com') ? router.push('/admin') : router.push('/')
 
 const order = ref(false)
 const products = ref(true)
@@ -26,6 +17,48 @@ const switchProducts = () => {
   order.value = false
 }
 
+const addProduct = reactive({
+  dialogFormVisible: false,
+  form: {
+    brand: '',
+    name: '',
+    price: '',
+    flavor: '',
+    qty: '',
+    servings: '',
+    info: '',
+    img: ''
+  },
+  formLabelWidth: '100px'
+})
+
+const productAdd = async () => {
+  try {
+    await store.dispatch('addProduct', addProduct.form)
+    router.go()
+    addProduct.dialogFormVisible = false
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const deleteProduct = async (param) => {
+  try {
+    await store.dispatch('deleteProduct', param._id)
+    router.go()
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const logout = async () => {
+  try {
+    await store.dispatch('logoutUser')
+    router.push('/')
+  } catch (error) {
+    console.log(error)
+  }
+}
 </script>
 
 <template>
@@ -38,54 +71,68 @@ const switchProducts = () => {
       <button v-if="!products" @click="switchProducts">PRODUCTS</button>
       <button v-if="order" class="order-active">ORDER LIST</button>
       <button v-if="!order" @click="switchOrder">ORDER LIST</button>
-      <button>LOGOUT</button>
+      <button @click="logout">LOGOUT</button>
     </div>
     <div class="order-products">
       <div v-if="order" class="order">
-        <el-empty description="You don't have any orders yet!"></el-empty>
+        <h1>order list </h1>
       </div>
       <div v-if="products" class="products">
-        <el-empty description="You don't have any product yet!"></el-empty>
-        <button class="addresses-button" @click="state.dialogFormVisible = true">ADD NEW</button>
+        <button class="products-button" @click="addProduct.dialogFormVisible = true">ADD NEW</button>
         <el-dialog
-          destroy-on-close="true"
-          v-model="state.dialogFormVisible"
+          v-model="addProduct.dialogFormVisible"
           width="30%"
           center
           title="ADD NEW"
         >
-          <el-form :model="state.form">
-            <el-form-item label="Brand" :label-width="state.formLabelWidth">
-              <el-input v-model="state.form.Brand" autocomplete="off"></el-input>
+          <el-form :model="addProduct.form">
+            <el-form-item label="Brand" :label-width="addProduct.formLabelWidth">
+              <el-input v-model="addProduct.form.brand" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="Name" :label-width="state.formLabelWidth">
-              <el-input v-model="state.form.Name" autocomplete="off"></el-input>
+            <el-form-item label="Name" :label-width="addProduct.formLabelWidth">
+              <el-input v-model="addProduct.form.name" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="Price" :label-width="state.formLabelWidth">
-              <el-input v-model="state.form.Price" autocomplete="off"></el-input>
+            <el-form-item label="Price" :label-width="addProduct.formLabelWidth">
+              <el-input v-model="addProduct.form.price" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="Flavor" :label-width="state.formLabelWidth">
-              <el-input v-model="state.form.Flavor" autocomplete="off"></el-input>
+            <el-form-item label="Flavor" :label-width="addProduct.formLabelWidth">
+              <el-input v-model="addProduct.form.flavor" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="Qty" :label-width="state.formLabelWidth">
-              <el-input v-model="state.form.Qty" autocomplete="off"></el-input>
+            <el-form-item label="Qty" :label-width="addProduct.formLabelWidth">
+              <el-input v-model="addProduct.form.qty" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="Info" :label-width="state.formLabelWidth">
-              <el-input v-model="state.form.Info" type="textarea" autocomplete="off"></el-input>
+            <el-form-item label="Servings" :label-width="addProduct.formLabelWidth">
+              <el-input v-model="addProduct.form.servings" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="Photo" :label-width="state.formLabelWidth">
-              <el-upload action="https://jsonplaceholder.typicode.com/posts/" multiple :limit="1">
-                <el-button size="small" type="success">Click to upload</el-button>
-              </el-upload>
+            <el-form-item label="Info" :label-width="addProduct.formLabelWidth">
+              <el-input v-model="addProduct.form.info" type="textarea" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="Image Url" :label-width="addProduct.formLabelWidth">
+              <el-input v-model="addProduct.form.img" autocomplete="off"></el-input>
             </el-form-item>
           </el-form>
           <template #footer>
             <span class="dialog-footer">
-              <el-button @click="state.dialogFormVisible = false">Cancel</el-button>
-              <el-button type="primary" @click="state.dialogFormVisible = false">Confirm</el-button>
+              <el-button @click="addProduct.dialogFormVisible = false">Cancel</el-button>
+              <el-button type="primary" @click="productAdd">Confirm</el-button>
             </span>
           </template>
         </el-dialog>
+        <div v-for="product in store.getters.products" :key="product" class="products-items">
+          <div class="products-items-qty">{{ product.qty }}</div>
+          <div class="products-items-img"><img :src="product.img" width="100"></div>
+          <div class="products-items-name-brand">
+            <div class="products-items-brand">{{ product.brand }}</div>
+            <div class="products-items-name">{{ product.name }}</div>
+          </div>
+          <div class="products-items-price">${{ product.price }}</div>
+          <font-awesome-icon
+            @click="deleteProduct(product)"
+            class="products-items-delete"
+            :icon="['fa', 'trash-alt']"
+            color="#5000b5"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -98,7 +145,7 @@ const switchProducts = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 50px 0 calc(50% - 500px) 0;
+  padding: 50px 0 calc(50% - 200px) 0;
   background-image: linear-gradient(
     66deg,
     #ff7171 3%,
@@ -149,8 +196,6 @@ const switchProducts = () => {
     .products {
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
       padding: 60px;
       width: 600px;
       background-color: white;
@@ -158,6 +203,69 @@ const switchProducts = () => {
       gap: 60px;
       border-radius: $base-radius;
       font-size: $base-font-m;
+
+      &-button {
+        background-color: $primary-color;
+        color: white;
+        border: none;
+        width: 280px;
+        height: 50px;
+        font-size: $base-font-m;
+        font-weight: 600;
+        box-shadow: $base-shadow;
+        align-self: center;
+
+        &:hover {
+          background-color: $primary-color-dark;
+          transition: all 0.3s ease-in-out 0s;
+          cursor: pointer;
+        }
+      }
+
+      &-items {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        border: 1px solid $dark;
+        padding: $base-padding;
+        border-radius: $base-radius;
+
+        &-name-brand {
+          display: flex;
+          flex-direction: column;
+          text-align: center;
+          gap: 10px;
+        }
+
+        &-qty {
+          display: flex;
+          background-color: black;
+          color: white;
+          padding: 10px;
+          font-weight: 600;
+          border-radius: 30px;
+        }
+
+        &-name {
+          font-size: 16px;
+          text-align: center;
+        }
+
+        &-price,
+        &-brand {
+          font-weight: 600;
+        }
+
+        &-delete {
+          font-size: 25px;
+          cursor: pointer;
+
+          &:hover {
+            color: $primary-color-dark;
+          }
+        }
+      }
     }
   }
 }

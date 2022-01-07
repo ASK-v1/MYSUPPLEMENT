@@ -1,21 +1,17 @@
-<script lang="ts" setup>
+<script setup>
 import Navbar from '../components/Navbar.vue'
 import Footer from '../components/Footer.vue'
 import Addresses from '../components/Addresses.vue'
-import { product } from '../cart'
 import { ref } from 'vue'
+import store from '../store'
+
+store.state.step = 'address'
+const addressData = store.getters.user.address
 
 const active = ref(2)
 const checked1 = ref('')
 const qty = ref(1)
 
-const userAddress = {
-  title: 'MY HOME',
-  userName: 'ahmet',
-  phone: '999 99 99',
-  address: 'aaaaaaaa bbbbbbbb',
-  country: 'TURKEY'
-}
 </script>
 
 <template>
@@ -40,14 +36,13 @@ const userAddress = {
             <font-awesome-icon class="map-icon" :icon="['fa', 'map-marker-alt']" color="#5000b5" />
             <h3>Delivery Address</h3>
           </div>
-          <div class="address-body-items-left-mid">
-            <el-checkbox class="address-body-items-left-mid-check" v-model="checked1">
-              <h4>{{ userAddress.title }}</h4>
-            </el-checkbox>
-            <div class="address-body-items-left-name">{{ userAddress.userName }}</div>
-            <div class="address-body-items-left-phone">{{ userAddress.phone }}</div>
-            <div class="address-body-items-left-address">{{ userAddress.address }}</div>
-            <div class="address-body-items-left-country">{{ userAddress.country }}</div>
+          <div v-for="address in addressData" v-bind:key="address" class="address-body-items-left-mid">
+            <el-checkbox class="address-body-items-left-mid-check" v-model="checked1">{{ address.addressTitle }}</el-checkbox>
+            <div class="address-body-items-left-name">{{ address.firstName }}</div>
+            <div class="address-body-items-left-name">{{ address.lastName }}</div>
+            <div class="address-body-items-left-phone">{{ address.phone }}</div>
+            <div class="address-body-items-left-address">{{ address.address }}</div>
+            <div class="address-body-items-left-country">{{ address.country }}</div>
             <font-awesome-icon class="trash-icon" :icon="['fa', 'trash-alt']" color="#5000b5" />
           </div>
           <Addresses />
@@ -134,7 +129,7 @@ const userAddress = {
     &-items {
       display: flex;
       align-items: flex-start;
-      gap: 400px;
+      gap: 200px;
 
       &-left {
         display: flex;
@@ -162,11 +157,18 @@ const userAddress = {
           padding: $base-padding;
 
           &-check {
-            margin-bottom: 20px;
+          margin-bottom: 20px;
+          background-color: rgb(0, 0, 0);
+          color: white;
+          font-family: "Lilita One", cursive;
+          font-size: $base-font-m;
+          padding: 7px;
+
             h4 {
-              color: black;
+              color: rgb(255, 255, 255);
             }
           }
+
           .trash-icon {
             font-size: 25px;
             cursor: pointer;

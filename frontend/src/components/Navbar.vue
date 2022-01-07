@@ -1,13 +1,16 @@
-<script lang="ts" setup>
-import { product } from '../cart'
+<script setup>
 import { ref } from 'vue'
-
+import store from '../store'
 const search = ref('')
 
 const cd = ref(false)
 const count = ref(1)
 const qty = ref(1)
 
+const isLogin = ref(store.getters.isLoggedIn)
+const product = {
+  price: 240
+}
 const subtotal = ref(product.price)
 const price = () => {
   subtotal.value = product.price * qty.value
@@ -35,7 +38,8 @@ const price = () => {
         </div>
       </div>
       <div class="account-cart">
-        <router-link to="/signin" class="sign">Sign In/Register</router-link>
+        <h4 v-if="isLogin" class="sign-welcome">Welcome {{ store.state.userData.firstName }}</h4>
+        <router-link v-else to="/signin" class="sign">Sign In/Register</router-link>
         <router-link to="/account" class="account">
           <font-awesome-icon :icon="['fa', 'user']" size="lg" />
         </router-link>
@@ -63,7 +67,6 @@ const price = () => {
   <el-drawer
     size="20%"
     lock-scroll="false"
-    custom-class="cart-drawer"
     show-close="false"
     v-model="cd"
   >
@@ -343,6 +346,7 @@ const price = () => {
         font-size: 20px;
         cursor: pointer;
         margin-top: 20px;
+
         &:hover {
           color: $primary-color-dark;
         }

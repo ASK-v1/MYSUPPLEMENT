@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup>
 import { ref, reactive } from 'vue'
 
 const value = ref(4.2)

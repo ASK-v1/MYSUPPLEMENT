@@ -1,8 +1,11 @@
-<script lang="ts" setup>
+<script setup>
 import Navbar from '../components/Navbar.vue'
 import Footer from '../components/Footer.vue'
-import { product } from '../cart'
 import { ref } from 'vue'
+import store from '../store'
+import router from '../router'
+
+(store.getters.step === 'address') ? router.push('/payment') : router.push('/')
 
 const active = ref(3)
 const qty = ref(1)
@@ -60,8 +63,7 @@ const checked1 = ref('')
           </div>
           <el-checkbox class="payment-body-items-left-check" v-model="checked1">
             <h4>
-              I have read and agree to the Terms and
-              Conditions
+              I have read and agree to the Terms and Conditions
               <br />& Privacy Policy of this online store.
             </h4>
           </el-checkbox>
@@ -176,6 +178,7 @@ const checked1 = ref('')
               flex-direction: column;
               gap: 10px;
             }
+
             &-name {
               display: flex;
               flex-direction: column;
@@ -193,6 +196,7 @@ const checked1 = ref('')
                 flex-direction: column;
                 gap: 10px;
               }
+
               .card-form-cvc {
                 display: flex;
                 flex-direction: column;
@@ -207,6 +211,7 @@ const checked1 = ref('')
           text-align: center;
           justify-content: center;
           align-items: center;
+
           h4 {
             color: $dark;
           }

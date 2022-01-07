@@ -1,16 +1,21 @@
-<script lang="ts" setup>
+<script setup>
 import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/Footer.vue'
 import Filters from '@/components/Filters.vue'
-import { bestsellersFirst, bestsellersSecond } from '../best'
-import { ref, onMounted } from 'vue'
+import store from '../store/index.js'
+import { ref } from 'vue'
 
-onMounted(() => {
-  window.scrollTo(0, 0)
-})
-
-const moreBest = bestsellersFirst.concat(bestsellersSecond).concat(bestsellersSecond).concat(bestsellersFirst).concat(bestsellersFirst)
+window.scrollTo(0, 0)
 const value = ref(3.7)
+
+const getProduct = async () => {
+  try {
+    await store.dispatch('getProduct')
+  } catch (error) {
+    console.log(error)
+  }
+}
+getProduct()
 
 </script>
 
@@ -23,31 +28,28 @@ const value = ref(3.7)
       <div class="products-body-filters">
         <Filters />
       </div>
-      <div class="products-body-item">
-        <div v-for="best in moreBest" :key="best.price" class="products-body-items">
-          <div class="products-body-items-image">
-            <router-link to="/product">
-              <img :src="best.url" width="260" />
-            </router-link>
-          </div>
-          <div class="products-body-items-title">
-            <h2>{{ best.title }}</h2>
-          </div>
-          <div class="products-body-items-rating">
-            <el-rate
-              v-model="value"
-              disabled
-              show-score
-              text-color="#ff9900"
-              score-template="{value} points"
-            ></el-rate>
-          </div>
-          <div class="products-body-items-price">
-            <h2>{{ best.price }}</h2>
-          </div>
-          <div class="products-body-items-add">
-            <button class="add-cart">ADD TO CART</button>
-          </div>
+      <div class="products-body-items">
+        <div v-for="product in store.getters.products" :key="product">
+          <router-link  to="/product" class="products-body-items-row">
+            <div class="products-body-items-row-image">
+              <img :src="product.img" width="260" />
+            </div>
+            <div class="products-body-items-row-name">
+              <h3>{{ product.name }}</h3>
+            </div>
+            <div class="products-body-items-row-rating">
+              <el-rate
+                v-model="value"
+                disabled
+                show-score
+                text-color="#ff9900"
+                score-template="{value} points"
+              ></el-rate>
+            </div>
+            <div class="products-body-items-row-price">
+              <h2>${{ product.price }}</h2>
+            </div>
+          </router-link>
         </div>
       </div>
     </div>
@@ -63,48 +65,42 @@ const value = ref(3.7)
 .products {
   &-body {
     display: flex;
-    flex-direction: row;
 
     &-filters {
       position: relative;
       left: 0;
     }
 
-    &-item {
+    &-items {
       display: flex;
       flex-direction: row;
+      justify-content: center;
       flex-wrap: wrap;
-      margin: 0 50px 250px 50px;
       gap: 50px;
+      margin: 0 20px 200px 20px;
 
-      .products-body-items {
+      &-row {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        gap: 10px;
+        text-align: center;
+        gap: 15px;
+        color: black;
+        text-decoration: none;
 
-        &-title,
         &-price {
-          font-size: $base-font-s;
+          font-weight: 600;
+          color: rgb(0, 0, 0);
+          padding: 10px;
         }
+        &:hover {
+          box-shadow: $base-shadow;
+          transition: all 0.3s ease-in-out 0s;
 
-        &-add {
-          button {
-            color: white;
-            padding: 20px;
-            font-size: $base-font-m;
-            box-shadow: $base-shadow;
-            background-color: $primary-color;
-            font-family: "Nunito Sans", sans-serif;
-            border: none;
+          .products-body-items-row-price {
             font-weight: 600;
-            margin-bottom: 20px;
-
-            &:hover {
-              background-color: $primary-color-dark;
-              transition: all 0.3s ease-in-out 0s;
-              cursor: pointer;
-            }
+            background-color: $primary-color;
+            color: white;
+            transition: all 0.3s ease-in-out 0s;
           }
         }
       }

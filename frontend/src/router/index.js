@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Account from '../views/Account.vue'
 import Signin from '../views/Signin.vue'
@@ -9,8 +9,10 @@ import Payment from '../views/Payment.vue'
 import Products from '../views/Products.vue'
 import Product from '../views/Product.vue'
 import Admin from '../views/Admin.vue'
+import NotFound from '../views/404.vue'
+import store from '../store'
 
-const routes: Array<RouteRecordRaw> = [
+const routes = [
   {
     path: '/',
     name: 'Home',
@@ -19,7 +21,11 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/account',
     name: 'Account',
-    component: Account
+    component: Account,
+    beforeEnter: (to, from, next) => {
+      if (!store.getters.isLoggedIn) next('/signin')
+      else next()
+    }
   },
   {
     path: '/signin',
@@ -44,7 +50,11 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/address',
     name: 'Address',
-    component: Address
+    component: Address,
+    beforeEnter: (to, from, next) => {
+      if (!store.getters.isLoggedIn) next('/signin')
+      else next()
+    }
   },
   {
     path: '/products',
@@ -60,6 +70,10 @@ const routes: Array<RouteRecordRaw> = [
     path: '/admin',
     name: 'Admin',
     component: Admin
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    component: NotFound
   }
 ]
 
