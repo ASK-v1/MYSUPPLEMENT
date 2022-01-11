@@ -1,7 +1,6 @@
 <script setup>
 import { ref } from 'vue'
 import store from '../store/index.js'
-const value = ref(3.7)
 
 const getProduct = async () => {
   try {
@@ -11,6 +10,20 @@ const getProduct = async () => {
   }
 }
 getProduct()
+
+const ratings = ref([])
+const sum = ref(0)
+
+store.getters.products.forEach((product, key) => {
+  if (product.review.length) {
+    product.review.forEach((review) => {
+      sum.value += review.rating
+    })
+    sum.value = (sum.value /= product.review.length).toFixed(1)
+    ratings.value[key] = sum.value
+    sum.value = 0
+  } else sum.value = 0
+})
 </script>
 
 <template>
@@ -19,8 +32,8 @@ getProduct()
       <h1>BESTSELLERS</h1>
     </div>
     <div class="best-products">
-      <div v-for="best in store.getters.products" :key="best">
-        <router-link to="/product" class="best-products-items">
+      <div v-for="(best, key) in store.getters.products" :key="best">
+        <router-link :to="`/product/${best._id}`" class="best-products-items">
           <div class="best-products-items-image">
             <img :src="best.img" width="260" />
           </div>
@@ -29,11 +42,10 @@ getProduct()
           </div>
           <div class="best-products-items-rating">
             <el-rate
-              v-model="value"
+              v-model="ratings[key]"
               disabled
               show-score
               text-color="#ff9900"
-              score-template="{value} points"
             ></el-rate>
           </div>
           <div class="best-products-items-price">
@@ -72,7 +84,7 @@ getProduct()
     justify-content: center;
     text-align: center;
     margin: 0 15% 0 15%;
-    gap: 50px;
+    gap: 25px;
 
     &-items {
       display: flex;
@@ -83,8 +95,9 @@ getProduct()
 
       &-price {
         font-weight: 600;
-        color: rgb(0, 0, 0);
-        padding: 10px;
+        color: black;
+        padding: $base-padding;
+        width: 250px;
       }
 
       &:hover {

@@ -2,29 +2,42 @@
 import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/Footer.vue'
 import Reviews from '@/components/Reviews.vue'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import store from '../store'
+import { useRoute } from 'vue-router'
 
 window.scrollTo(0, 0)
+const route = useRoute()
 
-const rating = ref(3.7)
+const product = computed(() => {
+  return store.getters.products.filter((product) => product._id === route.params.productId)[0]
+})
+
+const showError = ref(false)
+
+const total = ref(product.value.qty)
 const qty = ref(1)
-const size = ref(30)
-const value = ref('')
-const options = ref([
-  {
-    value: 'Option1',
-    label: 'Option1'
-  },
-  {
-    value: 'Option2',
-    label: 'Option2'
-  },
-  {
-    value: 'Option3',
-    label: 'Option3'
-  }
-])
+const sum = ref(0)
+const flavor = ref('')
+const flavors = product.value.flavor[0].split(',')
 
+if (product.value.review.length) {
+  product.value.review.forEach((review) => { sum.value += review.rating })
+  sum.value = (sum.value /= product.value.review.length).toFixed(1)
+} else sum.value = 0
+
+const addCart = () => {
+  if (flavor.value === '') showError.value = true
+  else {
+    const data = {
+      product: product.value,
+      qty: qty.value,
+      flavor: flavor.value
+    }
+    showError.value = false
+    store.dispatch('addToCart', data)
+  }
+}
 </script>
 
 <template>
@@ -33,48 +46,62 @@ const options = ref([
       <Navbar />
     </div>
     <div class="product-body">
-      <div class="product-body-image">
-        <img :src="product.image" width="320" height="320" />
+      <div class="product-body-bc-img">
+        <el-breadcrumb separator="/">
+          <el-breadcrumb-item :to="{ path: '/' }">Home</el-breadcrumb-item>
+          <el-breadcrumb-item :to="{ path: '/products' }">Products</el-breadcrumb-item>
+          <el-breadcrumb-item>{{ product.brand }}</el-breadcrumb-item>
+        </el-breadcrumb>
+        <div class="product-body-image">
+          <img :src="product.img" width="320" height="320" />
+        </div>
       </div>
       <div class="product-body-items">
-        <div class="product-body-items-title">
-          <h2>{{ product.title }}</h2>
+        <div class="product-body-items-brand">
+          <h2>{{ product.brand }}</h2>
+        </div>
+        <div class="product-body-items-name">
+          <h2>{{ product.name }}</h2>
         </div>
         <div class="products-body-items-rating">
           <el-rate
-            v-model="rating"
+            v-model="sum"
             disabled
             show-score
             text-color="#ff9900"
-            score-template="{value} points"
           ></el-rate>
         </div>
-        <div
-          class="product-body-items-info"
-        >Lorem ipsum, dolor sit amet consectetur adipisicing elit. Placeat dolor repellendus mollitia aut sit accusamus quam voluptate molestias sint natus. Accusamus fugit, dignissimos dicta modi minus harum vel blanditiis totam.</div>
+        <div class="product-body-items-info">{{ product.info }}</div>
       </div>
     </div>
+    <el-alert
+      v-if="showError"
+      title="Please select a flavor"
+      type="error"
+      show-icon
+      effect="dark"
+      center
+    >
+    </el-alert>
     <div class="product-bar">
       <div class="product-bar-price">${{ product.price }}</div>
-      <div class="product-bar-size">{{ size }} Servings</div>
+      <div class="product-bar-size">{{ product.servings }} Servings</div>
       <div class="product-bar-flavor">
         <h4>Flavor</h4>
-        <el-select v-model="value" placeholder="Select">
+        <el-select v-model="flavor" placeholder="Select">
           <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
+            v-for="item in flavors"
+            :key="item"
+            :label="item"
+            :value="item"
           ></el-option>
         </el-select>
       </div>
       <div class="product-bar-qty">
-        <h4>Quantity</h4>
-        <el-input-number v-model="qty" :min="1" :max="10" size="large" />
+        <h4>Qty</h4>
+        <el-input-number v-model="qty" :min="1" :max="total" size="large" />
       </div>
-      <div class="product-bar-button">
-        <h2>ADD TO CART</h2>
-      </div>
+      <button class="product-bar-button" @click="addCart">ADD TO CART</button>
     </div>
     <div class="product-reviews">
       <Reviews></Reviews>
@@ -98,6 +125,11 @@ const options = ref([
     flex-direction: row;
     justify-content: center;
 
+    &-bc-img {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+    }
     &-image {
       margin-left: 300px;
     }
@@ -108,6 +140,19 @@ const options = ref([
       justify-content: center;
       gap: 25px;
       margin: 0 300px 0 300px;
+
+      &-brand {
+        background-color: black;
+        color: white;
+        padding: 10px;
+        align-self: flex-start;
+        font-family: "Lilita One", cursive;
+        font-size: $base-font-s;
+      }
+
+      &-info {
+        inline-size: 500px;
+      }
     }
   }
 
@@ -125,11 +170,11 @@ const options = ref([
     &-price,
     &-size {
       padding: $base-padding;
-      color: $dark;
+      color: black;
       margin-top: 25px;
       background-color: rgb(255, 255, 255);
       border-radius: 10px;
-      border: 5px solid $dark;
+      border: 5px solid black;
       font-family: "Lilita One", cursive;
       font-size: $base-font-m;
     }
@@ -149,12 +194,13 @@ const options = ref([
     &-button {
       color: rgb(255, 255, 255);
       padding: 25px;
-      font-size: $base-font-s;
+      font-size: $base-font-m;
       font-weight: bold;
       background-color: rgb(0, 0, 0);
       text-align: center;
       margin-top: 30px;
       box-shadow: $base-shadow;
+      border: none;
 
       &:hover {
         background-color: $dark;
@@ -162,6 +208,9 @@ const options = ref([
         cursor: pointer;
       }
     }
+  }
+  &-footer {
+    margin-top: 200px;
   }
 }
 </style>

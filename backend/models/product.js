@@ -9,7 +9,9 @@ const productSchema = new Schema({
   servings: Number,
   info: String,
   img: String,
-  review: Array
+  review: Array,
+  form: String,
+  category: String
 })
 
 const Product = model('Product', productSchema)

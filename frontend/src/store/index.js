@@ -4,6 +4,8 @@ import createPersistedState from 'vuex-persistedstate'
 
 export default createStore({
   state: {
+    cart: [],
+    qty: '',
     status: '',
     step: '',
     token: localStorage.getItem('token') || '',
@@ -28,6 +30,18 @@ export default createStore({
       state.status = ''
       state.token = ''
       state.userData = ''
+    },
+    ADD_TO_CART (state, payload) {
+      const inCart = state.cart.find(item => {
+        return item.product._id === payload.product._id
+      })
+      if (inCart) inCart.qty += payload.qty
+      else state.cart.push(payload)
+      console.log(inCart)
+    },
+    DELETE_CART (state, payload) {
+      const index = state.cart.map(item => item.product._id).indexOf(payload.product._id)
+      state.cart.splice(index, 1)
     }
   },
   actions: {
@@ -71,6 +85,16 @@ export default createStore({
     async deleteProduct ({ commit }, productId) {
       await axios.delete(`http://localhost:3000/products/delete/${productId}`)
       await this.dispatch('getProduct')
+    },
+    async addReview ({ commit }, review) {
+      await axios.put('http://localhost:3000/products/review', review)
+      await this.dispatch('getProduct')
+    },
+    addToCart ({ commit }, product) {
+      commit('ADD_TO_CART', product)
+    },
+    deleteCart ({ commit }, product) {
+      commit('DELETE_CART', product)
     }
   },
   getters: {
@@ -78,7 +102,15 @@ export default createStore({
     authStatus: state => state.status,
     user: state => state.userData,
     step: state => state.step,
-    products: state => state.products
+    products: state => state.products,
+    cart: state => state.cart,
+    totalPrice: (state) => {
+      let total = 0
+      state.cart.forEach(item => {
+        total += item.product.price * item.qty
+      })
+      return total.toFixed(2)
+    }
   },
   plugins: [createPersistedState()]
 })

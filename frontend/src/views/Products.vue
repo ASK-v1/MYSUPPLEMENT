@@ -6,7 +6,6 @@ import store from '../store/index.js'
 import { ref } from 'vue'
 
 window.scrollTo(0, 0)
-const value = ref(3.7)
 
 const getProduct = async () => {
   try {
@@ -16,6 +15,20 @@ const getProduct = async () => {
   }
 }
 getProduct()
+
+const ratings = ref([])
+const sum = ref(0)
+
+store.getters.products.forEach((product, key) => {
+  if (product.review.length) {
+    product.review.forEach((review) => {
+      sum.value += review.rating
+    })
+    sum.value = (sum.value /= product.review.length).toFixed(1)
+    ratings.value[key] = sum.value
+    sum.value = 0
+  } else sum.value = 0
+})
 
 </script>
 
@@ -29,8 +42,8 @@ getProduct()
         <Filters />
       </div>
       <div class="products-body-items">
-        <div v-for="product in store.getters.products" :key="product">
-          <router-link  to="/product" class="products-body-items-row">
+        <div v-for="(product, index) in store.getters.products" :key="product">
+          <router-link :to="`/product/${product._id}`" class="products-body-items-row">
             <div class="products-body-items-row-image">
               <img :src="product.img" width="260" />
             </div>
@@ -39,11 +52,10 @@ getProduct()
             </div>
             <div class="products-body-items-row-rating">
               <el-rate
-                v-model="value"
+                v-model="ratings[index]"
                 disabled
                 show-score
                 text-color="#ff9900"
-                score-template="{value} points"
               ></el-rate>
             </div>
             <div class="products-body-items-row-price">
@@ -74,7 +86,7 @@ getProduct()
     &-items {
       display: flex;
       flex-direction: row;
-      justify-content: center;
+      justify-content: flex-start;
       flex-wrap: wrap;
       gap: 50px;
       margin: 0 20px 200px 20px;
@@ -89,8 +101,9 @@ getProduct()
 
         &-price {
           font-weight: 600;
-          color: rgb(0, 0, 0);
-          padding: 10px;
+          color: black;
+          padding: $base-padding;
+          width: 250px;
         }
         &:hover {
           box-shadow: $base-shadow;

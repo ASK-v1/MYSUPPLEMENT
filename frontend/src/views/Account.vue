@@ -5,10 +5,9 @@ import store from '../store'
 import router from '../router'
 import { ref } from 'vue'
 
-const addressData = store.getters.user.address
-
 const order = ref(false)
 const addresses = ref(true)
+
 const switchOrder = () => {
   order.value = true
   addresses.value = false
@@ -32,10 +31,8 @@ const deleteAddress = async (param) => {
     userId: store.state.userData._id,
     addr: param.id
   }
-
   try {
     await store.dispatch('deleteAddress', data)
-    router.go()
   } catch (error) {
     console.log(error)
   }
@@ -63,16 +60,17 @@ const deleteAddress = async (param) => {
           <h3>You don't have any orders yet!</h3>
         </div>
         <div v-if="addresses" class="addresses">
-          <div v-for="address in addressData" v-bind:key="address" class="addresses-items">
+          <Addresses></Addresses>
+          <h3 v-if="!store.getters.user.address[0]">You have no saved addresses.</h3>
+          <div v-for="address in store.getters.user.address" v-bind:key="address" class="addresses-items">
             <div class="addresses-items-title">{{ address.addressTitle }}</div>
             <div class="addresses-items-name">{{ address.firstName }}</div>
             <div class="addresses-items-name">{{ address.lastName.toUpperCase() }}</div>
+            <div class="addresses-items-phone">{{ address.phone }}</div>
             <div class="addresses-items-address">{{ address.address }}</div>
             <div class="addresses-items-country">{{ address.country }}</div>
             <font-awesome-icon @click="deleteAddress(address)" class="trash-icon" :icon="['fa', 'trash-alt']" color="#5000b5" />
           </div>
-          <h3 v-if="!store.getters.user.address[0]">You have no saved addresses.</h3>
-          <Addresses></Addresses>
         </div>
       </div>
     </div>
@@ -140,7 +138,7 @@ const deleteAddress = async (param) => {
       justify-content: center;
       align-items: center;
       padding: 60px;
-      width: 600px;
+      width: 800px;
       background-color: white;
       margin-top: 60px;
       gap: 60px;
@@ -155,12 +153,13 @@ const deleteAddress = async (param) => {
         border: 1px solid $dark;
         border-radius: $base-radius;
         padding: $base-padding;
+        inline-size: 633px;
 
         &-title {
           background-color: rgb(0, 0, 0);
           color: white;
           font-family: "Lilita One", cursive;
-          font-size: $base-font-m;
+          font-size: $base-font-l;
           padding: 7px;
         }
 

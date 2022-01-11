@@ -5,8 +5,6 @@ import { ref } from 'vue'
 import store from '../store'
 
 store.state.step = 'cart'
-
-const qty = ref(1)
 const active = ref(1)
 </script>
 
@@ -29,19 +27,19 @@ const active = ref(1)
       <div class="cart-body-items">
         <div class="cart-body-items-left">
           <div class="cart-body-items-left-image">
-            <img :src="product.image" width="160" height="160" />
+            <img :src="store.state.order.img" width="160" height="160" />
           </div>
           <div class="cart-body-items-left-title-info">
             <div class="cart-body-items-left-title">
-              <h3>{{ product.title }}</h3>
+              <h3>{{ store.state.order.brand }}</h3>
             </div>
-            <div class="cart-body-items-left-info">{{ product.info }}</div>
+            <div class="cart-body-items-left-info">{{ store.state.order.name }}</div>
           </div>
           <div class="cart-body-items-left-qty">
             <el-input-number v-model="qty" :min="1" :max="10" size="large" />
           </div>
           <div class="cart-body-items-left-total">
-            <h3>${{ product.price }}</h3>
+            <h3>${{ store.state.order.price }}</h3>
           </div>
           <font-awesome-icon
             class="cart-body-items-left-delete"

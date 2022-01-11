@@ -1,21 +1,14 @@
 <script setup>
 import { ref } from 'vue'
 import store from '../store'
+
 const search = ref('')
-
 const cd = ref(false)
-const count = ref(1)
-const qty = ref(1)
-
 const isLogin = ref(store.getters.isLoggedIn)
-const product = {
-  price: 240
-}
-const subtotal = ref(product.price)
-const price = () => {
-  subtotal.value = product.price * qty.value
-}
 
+const deleteCart = (products) => {
+  store.dispatch('deleteCart', products)
+}
 </script>
 
 <template>
@@ -38,7 +31,7 @@ const price = () => {
         </div>
       </div>
       <div class="account-cart">
-        <h4 v-if="isLogin" class="sign-welcome">Welcome {{ store.state.userData.firstName }}</h4>
+        <h4 v-if="isLogin" class="sign-welcome">Welcome {{ store.getters.user.firstName }}</h4>
         <router-link v-else to="/signin" class="sign">Sign In/Register</router-link>
         <router-link to="/account" class="account">
           <font-awesome-icon :icon="['fa', 'user']" size="lg" />
@@ -48,7 +41,7 @@ const price = () => {
             <font-awesome-icon :icon="['fa', 'shopping-cart']" size="lg" />
           </a>
           <div @click="cd = true" class="cart-count">
-            <p>{{ count }}</p>
+            <p>{{ store.getters.cart.length }}</p>
           </div>
         </div>
       </div>
@@ -77,15 +70,17 @@ const price = () => {
         </div>
         <div class="cart-drawer-close" @click="cd = !cd">x</div>
       </div>
-      <div class="cart-drawer-products">
-        <img :src="product.image" width="80" height="80" />
-        <div class="cart-drawer-products-title-price-info-qty">
-          <div class="cart-drawer-products-title">{{ product.title }}</div>
-          <div class="cart-drawer-products-info">{{ product.info }}</div>
-          <div class="cart-drawer-products-price">${{ product.price }}</div>
-          <el-input-number @click="price" v-model="qty" :min="1" :max="10" size="mini" />
+      <div v-if="store.getters.cart.length === 0" class="cart-drawer-no-items">THERE ARE NO ITEMS IN YOUR CART</div>
+      <div v-for="products in store.getters.cart" :key="products" class="cart-drawer-products">
+        <img :src="products.product.img" width="80" height="80" />
+        <div class="cart-drawer-products-brand-price-name-qty">
+          <div class="cart-drawer-products-brand">{{ products.product.brand }}</div>
+          <div class="cart-drawer-products-info">{{ products.product.name }}</div>
+          <div class="cart-drawer-products-price">${{ products.product.price }}</div>
+          <el-input-number v-model="products.qty" :min="1" :max="products.product.qty" size="mini" />
         </div>
         <font-awesome-icon
+          @click="deleteCart(products)"
           class="cart-drawer-products-delete"
           :icon="['fa', 'trash-alt']"
           color="#5000b5"
@@ -97,7 +92,7 @@ const price = () => {
             <h2>SUBTOTAL</h2>
           </div>
           <div class="subtotal-price">
-            <h3>${{ subtotal }}</h3>
+            <h3>${{ store.getters.totalPrice }}</h3>
           </div>
         </div>
         <div class="view-button">
@@ -230,13 +225,10 @@ const price = () => {
   &-body {
     position: fixed;
     top: 0;
-    right: 0;
     height: 100%;
     width: 20%;
     background-color: white;
     z-index: 1;
-    display: flex;
-    flex-direction: column;
 
     .cart-drawer-title-close {
       display: flex;
@@ -273,6 +265,16 @@ const price = () => {
         }
       }
     }
+
+    .cart-drawer-no-items {
+      text-align: center;
+      color: $dark;
+      margin-top: 100px;
+      padding: $base-padding;
+      font-weight: 600;
+      font-size: $base-font-l;
+    }
+
     .cart-drawer-lower {
       display: inline-flex;
       flex-direction: column;
@@ -283,6 +285,7 @@ const price = () => {
       bottom: 0;
       gap: 50px;
       position: absolute;
+      z-index: 1;
 
       .subtotal {
         display: flex;
@@ -299,6 +302,7 @@ const price = () => {
       .view-button {
         display: flex;
         justify-content: center;
+
         &-cart {
           color: rgb(0, 0, 0);
           padding: $base-padding;
@@ -319,27 +323,28 @@ const price = () => {
         }
       }
     }
+
     .cart-drawer-products {
-      margin-top: 50px;
+      margin-top: 10px;
       display: flex;
       padding: 20px 0 20px 0;
       flex-direction: row;
       justify-content: space-between;
-      border-top: 1px solid rgb(200, 200, 200);
       border-bottom: 1px solid rgb(200, 200, 200);
 
-      &-title-price-info-qty {
+      &-brand-price-name-qty {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         gap: 10px;
 
-        .cart-drawer-products-title,
+        .cart-drawer-products-brand,
         .cart-drawer-products-price {
           font-weight: 600;
         }
       }
+
       &-delete {
         text-align: center;
         margin-right: 20px;

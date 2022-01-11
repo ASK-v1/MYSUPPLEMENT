@@ -10,7 +10,6 @@ const addressData = store.getters.user.address
 
 const active = ref(2)
 const checked1 = ref('')
-const qty = ref(1)
 
 </script>
 
@@ -58,21 +57,21 @@ const qty = ref(1)
             <div class="address-body-items-right-summary-content">
               <img
                 class="address-body-items-right-summary-content-image"
-                :src="product.image"
+                :src="store.state.order.img"
                 width="80"
                 height="80"
               />
               <div class="address-body-items-right-summary-content-mid">
                 <div class="address-body-items-right-summary-content-mid-title">
-                  <h4>{{ product.title }}</h4>
+                  <h4>{{ store.state.order.brand }}</h4>
                 </div>
-                <div class="address-body-items-right-summary-content-mid-info">{{ product.info }}</div>
+                <div class="address-body-items-right-summary-content-mid-info">{{ store.state.order.name }}</div>
                 <div class="address-body-items-right-summary-content-mid-qty">
-                  <h5>Qty: {{ qty }}</h5>
+                  <h5>Qty: {{ store.state.order.qty }}</h5>
                 </div>
               </div>
               <div class="address-body-items-right-summary-content-price">
-                <h4>${{ product.price }}</h4>
+                <h4>${{ store.state.order.price }}</h4>
               </div>
             </div>
             <div class="address-body-items-right-summary-overview">

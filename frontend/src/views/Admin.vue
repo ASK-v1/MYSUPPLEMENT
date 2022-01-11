@@ -27,7 +27,9 @@ const addProduct = reactive({
     qty: '',
     servings: '',
     info: '',
-    img: ''
+    img: '',
+    form: '',
+    category: ''
   },
   formLabelWidth: '100px'
 })
@@ -35,7 +37,6 @@ const addProduct = reactive({
 const productAdd = async () => {
   try {
     await store.dispatch('addProduct', addProduct.form)
-    router.go()
     addProduct.dialogFormVisible = false
   } catch (error) {
     console.log(error)
@@ -45,7 +46,6 @@ const productAdd = async () => {
 const deleteProduct = async (param) => {
   try {
     await store.dispatch('deleteProduct', param._id)
-    router.go()
   } catch (error) {
     console.log(error)
   }
@@ -100,6 +100,12 @@ const logout = async () => {
             </el-form-item>
             <el-form-item label="Qty" :label-width="addProduct.formLabelWidth">
               <el-input v-model="addProduct.form.qty" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="Category" :label-width="addProduct.formLabelWidth">
+              <el-input v-model="addProduct.form.category" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="Form" :label-width="addProduct.formLabelWidth">
+              <el-input v-model="addProduct.form.form" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item label="Servings" :label-width="addProduct.formLabelWidth">
               <el-input v-model="addProduct.form.servings" autocomplete="off"></el-input>

@@ -1,16 +1,45 @@
 <script setup>
-import { ref, reactive } from 'vue'
+import { reactive, computed, ref } from 'vue'
+import { useRoute } from 'vue-router'
+import store from '../store'
+import router from '../router'
 
-const value = ref(4.2)
-const state = reactive({
+const date = new Date()
+const route = useRoute()
+
+const review = reactive({
   dialogFormVisible: false,
   form: {
     nickname: '',
-    reviewTitle: '',
-    review: ''
+    title: '',
+    review: '',
+    date: date.toLocaleDateString(),
+    rating: ''
   },
   formLabelWidth: '100px'
 })
+
+const addReview = async () => {
+  const data = {
+    productId: route.params.productId,
+    reviews: review.form
+  }
+  try {
+    await store.dispatch('addReview', data)
+    router.go()
+    review.dialogFormVisible = false
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const reviews = computed(() => {
+  return store.getters.products.filter((review) => review._id === route.params.productId)[0].review
+})
+
+const sum = ref(0)
+reviews.value.forEach((review) => { sum.value += review.rating })
+sum.value = (sum.value /= reviews.value.length).toFixed(1)
 </script>
 
 <template>
@@ -20,80 +49,78 @@ const state = reactive({
     </div>
     <div class="reviews-ratings">
       <div class="reviews-ratings-score">
-        <div class="reviews-ratings-score-title">{{ value }}</div>
+        <div v-if="!isNaN(sum)" class="reviews-ratings-score-title">{{ sum }}</div>
+        <div v-else class="reviews-ratings-score-title">0</div>
         <div class="reviews-ratings-score-star">
           <el-rate
-            v-model="value"
+            v-if="!isNaN(sum)"
+            v-model="sum"
             disabled
             show-score
             text-color="#ff9900"
-            score-template="{value} points"
           ></el-rate>
         </div>
-        <div class="reviews-ratings-score-number">3 Reviews</div>
+        <div class="reviews-ratings-score-number">{{ reviews.length }} Reviews</div>
       </div>
-      <div @click="state.dialogFormVisible = true" class="reviews-ratings-button">
+      <div @click="review.dialogFormVisible = true" class="reviews-ratings-button">
         <h3>WRITE A REVIEW</h3>
       </div>
     </div>
     <div class="reviews-write">
       <el-dialog
         destroy-on-close="true"
-        v-model="state.dialogFormVisible"
+        v-model="review.dialogFormVisible"
         width="30%"
         center
         title="WRITE A REVIEW"
       >
-        <el-form :model="state.form">
-          <el-form-item label="Nickname" :label-width="state.formLabelWidth">
-            <el-input v-model="state.form.nickname" autocomplete="off"></el-input>
+        <el-form :model="review.form">
+          <el-form-item label="Nickname" :label-width="review.formLabelWidth">
+            <el-input v-model="review.form.nickname" autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item label="Review title" :label-width="state.formLabelWidth">
-            <el-input v-model="state.form.reviewTitle" autocomplete="off"></el-input>
+          <el-form-item label="Review title" :label-width="review.formLabelWidth">
+            <el-input v-model="review.form.title" autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item label="Review" :label-width="state.formLabelWidth">
+          <el-form-item label="Review" :label-width="review.formLabelWidth">
             <el-input
-              v-model="state.form.review"
+              v-model="review.form.review"
               type="textarea"
               maxlength="100"
               autocomplete="off"
             ></el-input>
           </el-form-item>
-          <el-form-item :label-width="state.formLabelWidth">
-            <el-rate v-model="value" text-color="#ff9900" score-template="{value} points"></el-rate>
+          <el-form-item :label-width="review.formLabelWidth">
+            <el-rate v-model="review.form.rating" text-color="#ff9900"></el-rate>
           </el-form-item>
         </el-form>
         <template #footer>
           <span class="dialog-footer">
-            <el-button @click="state.dialogFormVisible = false">Cancel</el-button>
-            <el-button type="primary" @click="state.dialogFormVisible = false">Confirm</el-button>
+            <el-button @click="review.dialogFormVisible = false">Cancel</el-button>
+            <el-button type="primary" @click="addReview">Confirm</el-button>
           </span>
         </template>
       </el-dialog>
     </div>
-    <div class="reviews-field">
+    <div v-for="review in reviews" :key="review" class="reviews-field">
       <div class="reviews-field-left">
         <div class="reviews-field-left-nickname">
-          <h3>AHMET</h3>
+          <h3>{{ review.nickname }}</h3>
         </div>
         <div class="reviews-field-left-rating">
           <el-rate
-            v-model="value"
+            v-model="review.rating"
             disabled
             show-score
             text-color="#ff9900"
-            score-template="{value} points"
           ></el-rate>
         </div>
         <div class="reviews-field-left-date">
-          <h5>27.11.2021</h5>
+          <h5>{{ review.date }}</h5>
         </div>
       </div>
       <div class="reviews-field-right">
-        <div class="reviews-field-right-rt">My experience</div>
-        <div
-          class="reviews-field-right-r"
-        >Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit itaque animi fugit eveniet! Officiis ducimus sint</div>
+        <div class="reviews-field-right-title">{{ review.title }}</div>
+        <div class="reviews-field-right-review">{{ review.review }}</div>
       </div>
     </div>
   </div>
@@ -113,7 +140,7 @@ const state = reactive({
     font-family: "Lilita One", cursive;
     font-size: $base-font-m;
     padding: $base-padding;
-    margin-bottom: 50px;
+    margin-bottom: 100px;
   }
 
   &-ratings {
@@ -145,7 +172,7 @@ const state = reactive({
       text-align: center;
       box-shadow: $base-shadow;
       width: 200px;
-      margin: 50px 0 200px 0;
+      margin: 50px 0 100px 0;
 
       &:hover {
         background-color: $dark;
@@ -156,14 +183,11 @@ const state = reactive({
   }
   &-field {
     border-bottom: 1px solid $secondary-color;
-    border-top: 1px solid $secondary-color;
     padding: $base-padding;
     display: flex;
     flex-direction: row;
     gap: 100px;
     align-items: center;
-    justify-content: center;
-    margin: 0 10% 200px 10%;
 
     &-left,
     &-right {
@@ -171,8 +195,12 @@ const state = reactive({
       flex-direction: column;
       gap: 10px;
 
-      &-rt {
+      &-title {
         font-weight: 600;
+      }
+
+      &-review {
+        inline-size: 800px;
       }
     }
   }
