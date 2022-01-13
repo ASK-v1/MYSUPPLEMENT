@@ -1,13 +1,42 @@
 <script setup>
 import { ref } from 'vue'
 import store from '../store'
+import router from '../router'
 
+const drawer = ref(false)
 const search = ref('')
-const cd = ref(false)
 const isLogin = ref(store.getters.isLoggedIn)
 
 const deleteCart = (products) => {
   store.dispatch('deleteCart', products)
+}
+
+const products = ref(store.getters.products.map(p => ({
+  value: p.name,
+  link: p._id
+})))
+
+const querySearch = (queryString, cb) => {
+  const results = products.value.filter(createFilter(queryString))
+  cb(results)
+}
+
+const createFilter = (queryString) => {
+  return products => {
+    return products.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
+  }
+}
+
+const handleSelect = (item) => {
+  router.push(`/product/${item.link}`)
+}
+
+const addQty = (productId, productQty) => {
+  const data = {
+    id: productId,
+    qty: productQty
+  }
+  store.dispatch('addQty', data)
 }
 </script>
 
@@ -20,10 +49,11 @@ const deleteCart = (products) => {
       <div class="search">
         <el-autocomplete
           class="search-input"
+          :fetch-suggestions="querySearch"
           v-model="search"
-          placeholder="Search for Product"
-          :trigger-on-focus="false"
+          placeholder="Search"
           size="large"
+          @select="handleSelect"
         />
         <div class="search-icon">
           <router-link to="/" class="search-buttton"></router-link>
@@ -37,10 +67,10 @@ const deleteCart = (products) => {
           <font-awesome-icon :icon="['fa', 'user']" size="lg" />
         </router-link>
         <div class="cart-icon">
-          <a @click="cd = true" class="cart">
+          <a @click="drawer = true" class="cart">
             <font-awesome-icon :icon="['fa', 'shopping-cart']" size="lg" />
           </a>
-          <div @click="cd = true" class="cart-count">
+          <div @click="drawer = true" class="cart-count">
             <p>{{ store.getters.cart.length }}</p>
           </div>
         </div>
@@ -61,23 +91,22 @@ const deleteCart = (products) => {
     size="20%"
     lock-scroll="false"
     show-close="false"
-    v-model="cd"
+    v-model="drawer"
   >
     <div class="cart-drawer-body">
       <div class="cart-drawer-title-close">
         <div class="cart-drawer-title">
           <h1>YOUR ORDER</h1>
         </div>
-        <div class="cart-drawer-close" @click="cd = !cd">x</div>
+        <div class="cart-drawer-close" @click="drawer = !drawer">x</div>
       </div>
       <div v-if="store.getters.cart.length === 0" class="cart-drawer-no-items">THERE ARE NO ITEMS IN YOUR CART</div>
       <div v-for="products in store.getters.cart" :key="products" class="cart-drawer-products">
-        <img :src="products.product.img" width="80" height="80" />
-        <div class="cart-drawer-products-brand-price-name-qty">
-          <div class="cart-drawer-products-brand">{{ products.product.brand }}</div>
-          <div class="cart-drawer-products-info">{{ products.product.name }}</div>
+        <img :src="products.product.img" width="100" height="100" />
+        <div class="cart-drawer-products-price-name-qty">
+          <div class="cart-drawer-products-name">{{ products.product.name }}</div>
           <div class="cart-drawer-products-price">${{ products.product.price }}</div>
-          <el-input-number v-model="products.qty" :min="1" :max="products.product.qty" size="mini" />
+          <el-input-number @change="addQty(products.product._id, products.qty)" v-model="products.qty" :min="1" :max="products.product.qty" size="mini" />
         </div>
         <font-awesome-icon
           @click="deleteCart(products)"
@@ -145,7 +174,6 @@ const deleteCart = (products) => {
         display: flex;
         color: black;
         padding: 10px;
-        cursor: pointer;
       }
     }
 
@@ -325,21 +353,18 @@ const deleteCart = (products) => {
     }
 
     .cart-drawer-products {
-      margin-top: 10px;
+      margin-top: 50px;
       display: flex;
-      padding: 20px 0 20px 0;
       flex-direction: row;
       justify-content: space-between;
-      border-bottom: 1px solid rgb(200, 200, 200);
+      align-items: center;
 
-      &-brand-price-name-qty {
+      &-price-name-qty {
         display: flex;
         flex-direction: column;
-        justify-content: center;
         align-items: center;
         gap: 10px;
 
-        .cart-drawer-products-brand,
         .cart-drawer-products-price {
           font-weight: 600;
         }
@@ -350,7 +375,6 @@ const deleteCart = (products) => {
         margin-right: 20px;
         font-size: 20px;
         cursor: pointer;
-        margin-top: 20px;
 
         &:hover {
           color: $primary-color-dark;

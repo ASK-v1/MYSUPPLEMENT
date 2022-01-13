@@ -32,16 +32,17 @@ export default createStore({
       state.userData = ''
     },
     ADD_TO_CART (state, payload) {
-      const inCart = state.cart.find(item => {
-        return item.product._id === payload.product._id
-      })
+      const inCart = state.cart.find(item => { return item.product._id === payload.product._id })
       if (inCart) inCart.qty += payload.qty
       else state.cart.push(payload)
-      console.log(inCart)
     },
     DELETE_CART (state, payload) {
       const index = state.cart.map(item => item.product._id).indexOf(payload.product._id)
       state.cart.splice(index, 1)
+    },
+    ADD_QTY (state, payload) {
+      const inCart = state.cart.find(item => { return item.product._id === payload.id })
+      inCart.qty = payload.qty
     }
   },
   actions: {
@@ -95,6 +96,9 @@ export default createStore({
     },
     deleteCart ({ commit }, product) {
       commit('DELETE_CART', product)
+    },
+    addQty ({ commit }, product) {
+      commit('ADD_QTY', product)
     }
   },
   getters: {
@@ -106,9 +110,7 @@ export default createStore({
     cart: state => state.cart,
     totalPrice: (state) => {
       let total = 0
-      state.cart.forEach(item => {
-        total += item.product.price * item.qty
-      })
+      state.cart.forEach(item => { total += (item.product.price * item.qty) })
       return total.toFixed(2)
     }
   },

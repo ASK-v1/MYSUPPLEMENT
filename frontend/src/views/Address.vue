@@ -6,11 +6,22 @@ import { ref } from 'vue'
 import store from '../store'
 
 store.state.step = 'address'
-const addressData = store.getters.user.address
 
 const active = ref(2)
 const checked1 = ref('')
+const deliveryCost = 20
 
+const deleteAddress = async (param) => {
+  const data = {
+    userId: store.state.userData._id,
+    addr: param.id
+  }
+  try {
+    await store.dispatch('deleteAddress', data)
+  } catch (error) {
+    console.log(error)
+  }
+}
 </script>
 
 <template>
@@ -35,14 +46,14 @@ const checked1 = ref('')
             <font-awesome-icon class="map-icon" :icon="['fa', 'map-marker-alt']" color="#5000b5" />
             <h3>Delivery Address</h3>
           </div>
-          <div v-for="address in addressData" v-bind:key="address" class="address-body-items-left-mid">
+          <div v-for="address in store.getters.user.address" v-bind:key="address" class="address-body-items-left-mid">
             <el-checkbox class="address-body-items-left-mid-check" v-model="checked1">{{ address.addressTitle }}</el-checkbox>
             <div class="address-body-items-left-name">{{ address.firstName }}</div>
             <div class="address-body-items-left-name">{{ address.lastName }}</div>
             <div class="address-body-items-left-phone">{{ address.phone }}</div>
             <div class="address-body-items-left-address">{{ address.address }}</div>
             <div class="address-body-items-left-country">{{ address.country }}</div>
-            <font-awesome-icon class="trash-icon" :icon="['fa', 'trash-alt']" color="#5000b5" />
+            <font-awesome-icon @click="deleteAddress(address)" class="trash-icon" :icon="['fa', 'trash-alt']" color="#5000b5" />
           </div>
           <Addresses />
           <router-link class="address-body-items-left-button" to="/payment">
@@ -54,42 +65,39 @@ const checked1 = ref('')
             <div class="address-body-items-right-summary-title">
               <h2>ORDER SUMMARY</h2>
             </div>
-            <div class="address-body-items-right-summary-content">
+            <div v-for="products in store.getters.cart" :key="products" class="address-body-items-right-summary-content">
               <img
                 class="address-body-items-right-summary-content-image"
-                :src="store.state.order.img"
-                width="80"
-                height="80"
+                :src="products.product.img"
+                width="100"
+                height="100"
               />
               <div class="address-body-items-right-summary-content-mid">
-                <div class="address-body-items-right-summary-content-mid-title">
-                  <h4>{{ store.state.order.brand }}</h4>
+                <div class="address-body-items-right-summary-content-mid-brand">
+                  <h4>{{ products.product.brand }}</h4>
                 </div>
-                <div class="address-body-items-right-summary-content-mid-info">{{ store.state.order.name }}</div>
-                <div class="address-body-items-right-summary-content-mid-qty">
-                  <h5>Qty: {{ store.state.order.qty }}</h5>
-                </div>
+                <div class="address-body-items-right-summary-content-mid-name">{{ products.product.name }}</div>
               </div>
-              <div class="address-body-items-right-summary-content-price">
-                <h4>${{ store.state.order.price }}</h4>
+              <div class="address-body-items-right-summary-content-mid-qty">
+                <h5>Qty: {{ products.qty }}</h5>
               </div>
             </div>
             <div class="address-body-items-right-summary-overview">
               <div class="address-body-items-right-summary-overview-items">
                 <h3>OVERVIEW</h3>
-                <h4>1 ITEMS</h4>
+                <h4>{{ store.getters.cart.length }} ITEMS</h4>
               </div>
               <div class="address-body-items-right-summary-overview-subtotal">
                 <h5>SUBTOTAL</h5>
-                <h5>$58.99</h5>
+                <h5>${{ store.getters.totalPrice}}</h5>
               </div>
               <div class="address-body-items-right-summary-overview-delivery">
                 <h5>DELIVERY COST</h5>
-                <h5>$20</h5>
+                <h5>${{ deliveryCost }}</h5>
               </div>
               <div class="address-body-items-right-summary-overview-ordertotal">
                 <h3>ORDER TOTAL</h3>
-                <h4>$78.99</h4>
+                <h4>${{ (parseFloat(store.getters.totalPrice) + 20).toFixed(2) }}</h4>
               </div>
             </div>
           </div>
@@ -128,7 +136,7 @@ const checked1 = ref('')
     &-items {
       display: flex;
       align-items: flex-start;
-      gap: 200px;
+      gap: 400px;
 
       &-left {
         display: flex;
@@ -201,12 +209,16 @@ const checked1 = ref('')
         &-summary {
           display: flex;
           flex-direction: column;
-          gap: 60px;
+
+        &-title {
+          margin-bottom: 25px;
+        }
 
           &-overview {
             display: flex;
             flex-direction: column;
             gap: 30px;
+            margin-top: 25px;
 
             &-items,
             &-ordertotal {
@@ -230,15 +242,19 @@ const checked1 = ref('')
             display: flex;
             flex-direction: row;
             align-items: center;
+            justify-content: space-between;
             gap: 50px;
             padding: $base-padding;
             border-bottom: 1px solid $dark;
-            border-top: 1px solid $dark;
 
             &-mid {
               display: flex;
               flex-direction: column;
               gap: 10px;
+
+              &-name {
+                inline-size: 250px;
+              }
             }
           }
         }

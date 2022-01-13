@@ -13,9 +13,8 @@ const product = computed(() => {
   return store.getters.products.filter((product) => product._id === route.params.productId)[0]
 })
 
+const showSuccess = ref(false)
 const showError = ref(false)
-
-const total = ref(product.value.qty)
 const qty = ref(1)
 const sum = ref(0)
 const flavor = ref('')
@@ -35,6 +34,7 @@ const addCart = () => {
       flavor: flavor.value
     }
     showError.value = false
+    showSuccess.value = true
     store.dispatch('addToCart', data)
   }
 }
@@ -83,6 +83,15 @@ const addCart = () => {
       center
     >
     </el-alert>
+    <el-alert
+      v-if="showSuccess"
+      title="Added to your cart"
+      type="success"
+      show-icon
+      effect="dark"
+      center
+    >
+    </el-alert>
     <div class="product-bar">
       <div class="product-bar-price">${{ product.price }}</div>
       <div class="product-bar-size">{{ product.servings }} Servings</div>
@@ -99,7 +108,7 @@ const addCart = () => {
       </div>
       <div class="product-bar-qty">
         <h4>Qty</h4>
-        <el-input-number v-model="qty" :min="1" :max="total" size="large" />
+        <el-input-number v-model="qty" :min="1" :max="product.qty" size="large" />
       </div>
       <button class="product-bar-button" @click="addCart">ADD TO CART</button>
     </div>

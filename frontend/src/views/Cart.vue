@@ -6,6 +6,19 @@ import store from '../store'
 
 store.state.step = 'cart'
 const active = ref(1)
+const deliveryCost = 20
+
+const deleteCart = (products) => {
+  store.dispatch('deleteCart', products)
+}
+
+const addQty = (productId, productQty) => {
+  const data = {
+    id: productId,
+    qty: productQty
+  }
+  store.dispatch('addQty', data)
+}
 </script>
 
 <template>
@@ -25,44 +38,44 @@ const active = ref(1)
         <h1>SHOPPING CART</h1>
       </div>
       <div class="cart-body-items">
-        <div class="cart-body-items-left">
-          <div class="cart-body-items-left-image">
-            <img :src="store.state.order.img" width="160" height="160" />
-          </div>
-          <div class="cart-body-items-left-title-info">
-            <div class="cart-body-items-left-title">
-              <h3>{{ store.state.order.brand }}</h3>
+        <div class="cart-body-items-el">
+          <div v-for="products in store.getters.cart" :key="products"   class="cart-body-items-el-left">
+            <div class="cart-body-items-el-left-image">
+              <img :src="products.product.img" width="150" height="150" />
             </div>
-            <div class="cart-body-items-left-info">{{ store.state.order.name }}</div>
+            <div class="cart-body-items-el-left-brand-name">
+              <div class="cart-body-items-left-el-brand">
+                <h3>{{ products.product.brand }}</h3>
+              </div>
+              <div class="cart-body-items-el-left-name">{{ products.product.name }}</div>
+            </div>
+            <div class="cart-body-items-el-left-qty">
+              <el-input-number @change="addQty(products.product._id, products.qty)" v-model="products.qty" :min="1" :max="products.product.qty" size="large" />
+            </div>
+            <font-awesome-icon
+              @click="deleteCart(products)"
+              class="cart-body-items-el-left-delete"
+              :icon="['fa', 'trash-alt']"
+              color="#5000b5"
+            />
           </div>
-          <div class="cart-body-items-left-qty">
-            <el-input-number v-model="qty" :min="1" :max="10" size="large" />
-          </div>
-          <div class="cart-body-items-left-total">
-            <h3>${{ store.state.order.price }}</h3>
-          </div>
-          <font-awesome-icon
-            class="cart-body-items-left-delete"
-            :icon="['fa', 'trash-alt']"
-            color="#5000b5"
-          />
         </div>
         <div class="cart-body-items-right">
           <div class="cart-body-items-right-overview">
             <h3>OVERVIEW</h3>
-            <h4>1 ITEMS</h4>
+            <h4>{{ store.getters.cart.length }}</h4>
           </div>
           <div class="cart-body-items-right-subtotal">
             <h5>SUBTOTAL</h5>
-            <h5>$58.99</h5>
+            <h5>${{ store.getters.totalPrice }}</h5>
           </div>
           <div class="cart-body-items-right-delivery">
             <h5>DELIVERY COST</h5>
-            <h5>$20</h5>
+            <h5>${{ deliveryCost }}</h5>
           </div>
           <div class="cart-body-items-right-ordertotal">
             <h3>ORDER TOTAL</h3>
-            <h4>$78.99</h4>
+            <h4>${{ (parseFloat(store.getters.totalPrice) + 20).toFixed(2) }}</h4>
           </div>
           <div class="cart-body-items-right-buttons">
             <router-link class="checkout" to="/address">
@@ -107,26 +120,39 @@ const active = ref(1)
 
     &-items {
       display: flex;
-      gap: 222px;
+      gap: 250px;
       align-items: flex-start;
+      flex-direction: row;
 
-      &-left {
+      &-el {
         display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 30px;
+        flex-direction: column;
+        gap: 25px;
 
-        &-title-info {
+        &-left {
           display: flex;
-          flex-direction: column;
-          gap: 10px;
-        }
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          gap: 50px;
 
-        &-delete {
-          font-size: 25px;
-          cursor: pointer;
-          &:hover {
-            color: $primary-color-dark;
+          &-brand-name {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+          }
+
+          &-name {
+            inline-size: 250px;
+          }
+
+          &-delete {
+            font-size: 25px;
+            cursor: pointer;
+
+            &:hover {
+              color: $primary-color-dark;
+            }
           }
         }
       }

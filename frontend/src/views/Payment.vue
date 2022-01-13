@@ -8,8 +8,6 @@ import router from '../router'
 (store.getters.step === 'address') ? router.push('/payment') : router.push('/')
 
 const active = ref(3)
-const qty = ref(1)
-
 const cardNumber = ref('')
 const NameOnCard = ref('')
 const expiryDate = ref('')
@@ -76,34 +74,31 @@ const checked1 = ref('')
             <div class="payment-body-items-right-summary-title">
               <h2>ORDER SUMMARY</h2>
             </div>
-            <div class="payment-body-items-right-summary-content">
+            <div v-for="products in store.getters.cart" :key="products" class="payment-body-items-right-summary-content">
               <img
                 class="payment-body-items-right-summary-content-image"
-                :src="product.image"
-                width="80"
-                height="80"
+                :src="products.product.img"
+                width="100"
+                height="100"
               />
               <div class="payment-body-items-right-summary-content-mid">
-                <div class="payment-body-items-right-summary-content-mid-title">
-                  <h4>{{ product.title }}</h4>
+                <div class="payment-body-items-right-summary-content-mid-brand">
+                  <h4>{{ products.product.brand }}</h4>
                 </div>
-                <div class="payment-body-items-right-summary-content-mid-info">{{ product.info }}</div>
+                <div class="payment-body-items-right-summary-content-mid-name">{{ products.product.name }}</div>
+              </div>
                 <div class="payment-body-items-right-summary-content-mid-qty">
-                  <h5>Qty: {{ qty }}</h5>
+                  <h5>Qty: {{ products.qty }}</h5>
                 </div>
-              </div>
-              <div class="payment-body-items-right-summary-content-price">
-                <h4>${{ product.price }}</h4>
-              </div>
             </div>
             <div class="payment-body-items-right-summary-overview">
               <div class="payment-body-items-right-summary-overview-items">
                 <h3>OVERVIEW</h3>
-                <h4>1 ITEMS</h4>
+                <h4>{{ store.getters.cart.length }} ITEMS</h4>
               </div>
               <div class="payment-body-items-right-summary-overview-subtotal">
                 <h5>SUBTOTAL</h5>
-                <h5>$58.99</h5>
+                <h5>${{ store.getters.totalPrice }}</h5>
               </div>
               <div class="payment-body-items-right-summary-overview-delivery">
                 <h5>DELIVERY COST</h5>
@@ -111,7 +106,7 @@ const checked1 = ref('')
               </div>
               <div class="payment-body-items-right-summary-overview-ordertotal">
                 <h3>ORDER TOTAL</h3>
-                <h4>$78.99</h4>
+                <h4>${{ (parseFloat(store.getters.totalPrice) + 20).toFixed(2) }}</h4>
               </div>
             </div>
           </div>
@@ -239,12 +234,15 @@ const checked1 = ref('')
         &-summary {
           display: flex;
           flex-direction: column;
-          gap: 60px;
 
+        &-title {
+          margin-bottom: 25px;
+        }
           &-overview {
             display: flex;
             flex-direction: column;
             gap: 30px;
+            margin-top: 25px;
 
             &-items,
             &-ordertotal {
@@ -269,14 +267,18 @@ const checked1 = ref('')
             flex-direction: row;
             align-items: center;
             gap: 50px;
+            justify-content: space-between;
             padding: $base-padding;
             border-bottom: 1px solid $dark;
-            border-top: 1px solid $dark;
 
             &-mid {
               display: flex;
               flex-direction: column;
               gap: 10px;
+
+              &-name {
+                inline-size: 250px;
+              }
             }
           }
         }
