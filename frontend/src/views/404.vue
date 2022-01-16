@@ -21,12 +21,7 @@ import Navbar from '../components/Navbar.vue'
 
   h1 {
     font-size: 200px;
-    background: linear-gradient(
-      66deg,
-      #ff7171 3%,
-      #c850c0 33%,
-      #ffcc70 99%
-    );
+    background: linear-gradient(66deg, #ff7171 3%, #c850c0 33%, #ffcc70 99%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }

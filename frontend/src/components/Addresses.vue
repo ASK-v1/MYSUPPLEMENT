@@ -16,7 +16,8 @@ const addAddress = reactive({
     lastName: '',
     phone: '',
     address: '',
-    country: ''
+    country: '',
+    selected: false
   },
   formLabelWidth: '100px'
 })
@@ -48,7 +49,7 @@ const saveAddress = async () => {
   >
     <el-form :model="addAddress.form">
       <el-form-item label="Address Title" :label-width="addAddress.formLabelWidth">
-      <el-input v-model="addAddress.form.addressTitle" autocomplete="off"></el-input>
+        <el-input v-model="addAddress.form.addressTitle" autocomplete="off"></el-input>
       </el-form-item>
       <el-form-item label="First Name" :label-width="addAddress.formLabelWidth">
         <el-input v-model="addAddress.form.firstName" autocomplete="off"></el-input>
@@ -60,7 +61,12 @@ const saveAddress = async () => {
         <el-input v-model="addAddress.form.phone" autocomplete="off"></el-input>
       </el-form-item>
       <el-form-item label="Address" :label-width="addAddress.formLabelWidth">
-        <el-input maxlength="50" type="textarea" v-model="addAddress.form.address" autocomplete="off"></el-input>
+        <el-input
+          maxlength="40"
+          type="textarea"
+          v-model="addAddress.form.address"
+          autocomplete="off"
+        ></el-input>
       </el-form-item>
       <el-form-item label="Country" :label-width="addAddress.formLabelWidth">
         <el-select required v-model="addAddress.form.country">
@@ -101,7 +107,7 @@ const saveAddress = async () => {
   background-color: $primary-color;
   color: white;
   border: none;
-  width: 280px;
+  width: 530px;
   height: 50px;
   font-size: $base-font-m;
   font-weight: 600;

@@ -8,13 +8,9 @@ import { ref } from 'vue'
 const order = ref(false)
 const addresses = ref(true)
 
-const switchOrder = () => {
-  order.value = true
-  addresses.value = false
-}
-const switchAddresses = () => {
-  addresses.value = true
-  order.value = false
+const switchOrderAddress = () => {
+  order.value = !order.value
+  addresses.value = !addresses.value
 }
 
 const logout = async () => {
@@ -26,10 +22,10 @@ const logout = async () => {
   }
 }
 
-const deleteAddress = async (param) => {
+const deleteAddress = async (address) => {
   const data = {
-    userId: store.state.userData._id,
-    addr: param.id
+    userId: store.getters.user._id,
+    addr: address.id
   }
   try {
     await store.dispatch('deleteAddress', data)
@@ -37,6 +33,7 @@ const deleteAddress = async (param) => {
     console.log(error)
   }
 }
+
 </script>
 
 <template>
@@ -50,31 +47,93 @@ const deleteAddress = async (param) => {
       </div>
       <div class="account-buttons">
         <button v-if="addresses" class="addresses-active">ADDRESSES</button>
-        <button v-if="!addresses" @click="switchAddresses">ADDRESSES</button>
+        <button v-if="!addresses" @click="switchOrderAddress">ADDRESSES</button>
         <button v-if="order" class="order-active">ORDER HISTORY</button>
-        <button v-if="!order" @click="switchOrder">ORDER HISTORY</button>
+        <button v-if="!order" @click="switchOrderAddress">ORDER HISTORY</button>
         <button @click="logout">LOGOUT</button>
       </div>
       <div class="order-addresses">
         <div v-if="order" class="order">
-          <h3>You don't have any orders yet!</h3>
+          <h3 v-if="!store.getters.user">You don't have any orders yet!</h3>
+          <div v-for="order in store.user" :key="order" class="order-items">
+            <img class="order-items-image" :src="order.img" width="100" height="100" />
+            <div class="order-items-mid">
+              <div class="order-items-image-mid-brand">
+                <h4>{{ products.product.brand }}</h4>
+              </div>
+              <div class="order-items-mid-name">{{ products.product.name }}</div>
+              <div class="order-items-qty">
+                <h5>Qty: {{ products.qty }}</h5>
+              </div>
+            </div>
+          </div>
+          <div class="order-items-overview">
+            <div class="order-items-overview-item">
+              <h3>OVERVIEW</h3>
+              <h4>{{ store.getters.cart.length }} ITEMS</h4>
+            </div>
+            <div class="order-items-overview-subtotal">
+              <h5>SUBTOTAL</h5>
+              <h5>${{ store.getters.totalPrice }}</h5>
+            </div>
+            <div class="order-items-overview-delivery">
+              <h5>DELIVERY COST</h5>
+              <h5>$20</h5>
+            </div>
+            <div class="order-items-overview-ordertotal">
+              <h3>ORDER TOTAL</h3>
+              <h4>${{ (parseFloat(store.getters.totalPrice) + 20).toFixed(2) }}</h4>
+            </div>
+          </div>
         </div>
         <div v-if="addresses" class="addresses">
           <Addresses></Addresses>
           <h3 v-if="!store.getters.user.address[0]">You have no saved addresses.</h3>
-          <div v-for="address in store.getters.user.address" v-bind:key="address" class="addresses-items">
+          <div
+            v-for="(address, index) in store.getters.user.address"
+            v-bind:key="index"
+            class="addresses-items"
+          >
+            <el-alert
+              v-if="store.getters.user.address[index].selected"
+              title="Selected"
+              type="success"
+              center
+              show-icon
+            ></el-alert>
             <div class="addresses-items-title">{{ address.addressTitle }}</div>
-            <div class="addresses-items-name">{{ address.firstName }}</div>
-            <div class="addresses-items-name">{{ address.lastName.toUpperCase() }}</div>
-            <div class="addresses-items-phone">{{ address.phone }}</div>
-            <div class="addresses-items-address">{{ address.address }}</div>
-            <div class="addresses-items-country">{{ address.country }}</div>
-            <font-awesome-icon @click="deleteAddress(address)" class="trash-icon" :icon="['fa', 'trash-alt']" color="#5000b5" />
+            <div class="addresses-items-name">
+              <h3>First Name:</h3>
+              <h4>{{ address.firstName }}</h4>
+            </div>
+            <div class="addresses-items-name">
+              <h3>Last Name:</h3>
+              <h4>{{ address.lastName.toUpperCase() }}</h4>
+            </div>
+            <div class="addresses-items-phone">
+              <h3>Phone:</h3>
+              <h4>{{ address.phone }}</h4>
+            </div>
+            <div class="addresses-items-address">
+              <h3>Address:</h3>
+              <h4>{{ address.address }}</h4>
+            </div>
+            <div class="addresses-items-country">
+              <h3>Country:</h3>
+              <h4>{{ address.country }}</h4>
+            </div>
+            <font-awesome-icon
+              @click="deleteAddress(address)"
+              class="trash-icon"
+              :icon="['fa', 'trash-alt']"
+              color="#5000b5"
+            />
           </div>
         </div>
       </div>
     </div>
   </div>
+  <div v-loading.fullscreen.lock="store.getters.status === 'loading'" />
 </template>
 
 <style lang="scss">
@@ -141,32 +200,46 @@ const deleteAddress = async (param) => {
       width: 800px;
       background-color: white;
       margin-top: 60px;
-      gap: 60px;
+      gap: 30px;
       border-radius: $base-radius;
-      font-size: $base-font-m;
 
       &-items {
         display: flex;
         flex-direction: column;
-        align-items: center;
         gap: 10px;
         border: 1px solid $dark;
         border-radius: $base-radius;
         padding: $base-padding;
-        inline-size: 633px;
+        inline-size: 500px;
 
         &-title {
-          background-color: rgb(0, 0, 0);
-          color: white;
+          color: $primary-color;
           font-family: "Lilita One", cursive;
           font-size: $base-font-l;
           padding: 7px;
+          margin-bottom: 10px;
+          text-align: center;
+        }
+
+        &-name,
+        &-phone,
+        &-country,
+        &-address {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          gap: 10px;
+          color: $dark;
+
+          h3 {
+            color: black;
+          }
         }
 
         .trash-icon {
           font-size: 25px;
           cursor: pointer;
-          margin-top: 20px;
+          align-self: center;
 
           &:hover {
             color: $primary-color-dark;

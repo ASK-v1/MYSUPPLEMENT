@@ -3,18 +3,19 @@ import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/Footer.vue'
 import Filters from '@/components/Filters.vue'
 import store from '../store/index.js'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 window.scrollTo(0, 0)
 
-const getProduct = async () => {
-  try {
-    await store.dispatch('getProduct')
-  } catch (error) {
-    console.log(error)
-  }
-}
-getProduct()
+onMounted(() => {
+  (async () => {
+    try {
+      await store.dispatch('getProduct')
+    } catch (error) {
+      console.log(error)
+    }
+  })()
+})
 
 const ratings = ref([])
 const sum = ref(0)
@@ -29,7 +30,6 @@ store.getters.products.forEach((product, key) => {
     sum.value = 0
   } else sum.value = 0
 })
-
 </script>
 
 <template>
@@ -45,18 +45,13 @@ store.getters.products.forEach((product, key) => {
         <div v-for="(product, index) in store.getters.products" :key="product">
           <router-link :to="`/product/${product._id}`" class="products-body-items-row">
             <div class="products-body-items-row-image">
-              <img :src="product.img" width="260" />
+              <img :src="product.img" width="250" />
             </div>
             <div class="products-body-items-row-name">
               <h3>{{ product.name }}</h3>
             </div>
             <div class="products-body-items-row-rating">
-              <el-rate
-                v-model="ratings[index]"
-                disabled
-                show-score
-                text-color="#ff9900"
-              ></el-rate>
+              <el-rate v-model="ratings[index]" disabled show-score text-color="#ff9900"></el-rate>
             </div>
             <div class="products-body-items-row-price">
               <h2>${{ product.price }}</h2>
@@ -69,6 +64,7 @@ store.getters.products.forEach((product, key) => {
       <Footer />
     </div>
   </div>
+  <div v-loading.fullscreen.lock="store.getters.status === 'loading'" />
 </template>
 
 <style lang="scss">
@@ -105,6 +101,7 @@ store.getters.products.forEach((product, key) => {
           padding: $base-padding;
           width: 250px;
         }
+
         &:hover {
           box-shadow: $base-shadow;
           transition: all 0.3s ease-in-out 0s;

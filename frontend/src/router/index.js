@@ -40,12 +40,22 @@ const routes = [
   {
     path: '/cart',
     name: 'Cart',
-    component: Cart
+    component: Cart,
+    beforeEnter: (to, from, next) => {
+      if (store.getters.cart.length === 0) next('/')
+      else next()
+    }
   },
   {
     path: '/payment',
     name: 'Payment',
-    component: Payment
+    component: Payment,
+    beforeEnter: (to, from, next) => {
+      if (!store.getters.isLoggedIn) next('/signin')
+      else if (store.getters.cart.length === 0) next('/')
+      else if (!store.getters.user.address.some(address => address.selected === true)) next('/')
+      else next()
+    }
   },
   {
     path: '/address',
@@ -53,6 +63,7 @@ const routes = [
     component: Address,
     beforeEnter: (to, from, next) => {
       if (!store.getters.isLoggedIn) next('/signin')
+      else if (store.getters.cart.length === 0) next('/')
       else next()
     }
   },
@@ -69,7 +80,11 @@ const routes = [
   {
     path: '/admin',
     name: 'Admin',
-    component: Admin
+    component: Admin,
+    beforeEnter: (to, from, next) => {
+      if (store.state.userData.email !== 'admin@gmail.com') next('/')
+      else next()
+    }
   },
   {
     path: '/:pathMatch(.*)*',

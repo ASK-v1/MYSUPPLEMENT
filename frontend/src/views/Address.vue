@@ -4,23 +4,28 @@ import Footer from '../components/Footer.vue'
 import Addresses from '../components/Addresses.vue'
 import { ref } from 'vue'
 import store from '../store'
-
-store.state.step = 'address'
+import router from '../router'
 
 const active = ref(2)
-const checked1 = ref('')
 const deliveryCost = 20
+const showError = ref(false)
 
-const deleteAddress = async (param) => {
+const selectAddress = async (address) => {
   const data = {
-    userId: store.state.userData._id,
-    addr: param.id
+    userId: store.getters.user._id,
+    selectId: address.id,
+    len: store.getters.user.address.length
   }
   try {
-    await store.dispatch('deleteAddress', data)
+    await store.dispatch('selectAddress', data)
   } catch (error) {
     console.log(error)
   }
+}
+
+const addressCheck = () => {
+  if (store.getters.user.address.some(address => address.selected === true)) router.push('/payment')
+  else showError.value = true
 }
 </script>
 
@@ -46,26 +51,63 @@ const deleteAddress = async (param) => {
             <font-awesome-icon class="map-icon" :icon="['fa', 'map-marker-alt']" color="#5000b5" />
             <h3>Delivery Address</h3>
           </div>
-          <div v-for="address in store.getters.user.address" v-bind:key="address" class="address-body-items-left-mid">
-            <el-checkbox class="address-body-items-left-mid-check" v-model="checked1">{{ address.addressTitle }}</el-checkbox>
-            <div class="address-body-items-left-name">{{ address.firstName }}</div>
-            <div class="address-body-items-left-name">{{ address.lastName }}</div>
-            <div class="address-body-items-left-phone">{{ address.phone }}</div>
-            <div class="address-body-items-left-address">{{ address.address }}</div>
-            <div class="address-body-items-left-country">{{ address.country }}</div>
-            <font-awesome-icon @click="deleteAddress(address)" class="trash-icon" :icon="['fa', 'trash-alt']" color="#5000b5" />
+          <el-alert
+            class="error"
+            v-if="this.showError"
+            title="Please select address"
+            type="error"
+            effect="dark"
+          ></el-alert>
+          <div
+            v-for="(address, index) in store.getters.user.address"
+            v-bind:key="index"
+            class="address-body-items-left-mid"
+            @click="selectAddress(address)"
+          >
+            <el-alert
+              v-if="store.getters.user.address[index].selected"
+              title="Selected"
+              type="success"
+              center
+              show-icon
+            ></el-alert>
+            <div class="address-body-items-left-mid-title">{{ address.addressTitle }}</div>
+            <div class="address-body-items-left-mid-name">
+              <h3>First Name:</h3>
+              <h4>{{ address.firstName }}</h4>
+            </div>
+            <div class="address-body-items-left-mid-name">
+              <h3>Last Name:</h3>
+              <h4>{{ address.lastName.toUpperCase() }}</h4>
+            </div>
+            <div class="address-body-items-left-mid-phone">
+              <h3>Phone:</h3>
+              <h4>{{ address.phone }}</h4>
+            </div>
+            <div class="address-body-items-left-mid-address">
+              <h3>Address:</h3>
+              <h4>{{ address.address }}</h4>
+            </div>
+            <div class="address-body-items-left-mid-country">
+              <h3>Country:</h3>
+              <h4>{{ address.country }}</h4>
+            </div>
           </div>
           <Addresses />
-          <router-link class="address-body-items-left-button" to="/payment">
+          <button @click="addressCheck" class="address-body-items-left-button">
             <h2>PROCEED TO PAYMENT</h2>
-          </router-link>
+          </button>
         </div>
         <div class="address-body-items-right">
           <div class="address-body-items-right-summary">
             <div class="address-body-items-right-summary-title">
               <h2>ORDER SUMMARY</h2>
             </div>
-            <div v-for="products in store.getters.cart" :key="products" class="address-body-items-right-summary-content">
+            <div
+              v-for="products in store.getters.cart"
+              :key="products"
+              class="address-body-items-right-summary-content"
+            >
               <img
                 class="address-body-items-right-summary-content-image"
                 :src="products.product.img"
@@ -76,7 +118,9 @@ const deleteAddress = async (param) => {
                 <div class="address-body-items-right-summary-content-mid-brand">
                   <h4>{{ products.product.brand }}</h4>
                 </div>
-                <div class="address-body-items-right-summary-content-mid-name">{{ products.product.name }}</div>
+                <div
+                  class="address-body-items-right-summary-content-mid-name"
+                >{{ products.product.name }}</div>
               </div>
               <div class="address-body-items-right-summary-content-mid-qty">
                 <h5>Qty: {{ products.qty }}</h5>
@@ -89,7 +133,7 @@ const deleteAddress = async (param) => {
               </div>
               <div class="address-body-items-right-summary-overview-subtotal">
                 <h5>SUBTOTAL</h5>
-                <h5>${{ store.getters.totalPrice}}</h5>
+                <h5>${{ store.getters.totalPrice }}</h5>
               </div>
               <div class="address-body-items-right-summary-overview-delivery">
                 <h5>DELIVERY COST</h5>
@@ -108,6 +152,7 @@ const deleteAddress = async (param) => {
       <Footer />
     </div>
   </div>
+  <div v-loading.fullscreen.lock="store.getters.status === 'loading'" />
 </template>
 
 <style lang="scss">
@@ -136,12 +181,12 @@ const deleteAddress = async (param) => {
     &-items {
       display: flex;
       align-items: flex-start;
-      gap: 400px;
+      gap: 200px;
 
       &-left {
         display: flex;
         flex-direction: column;
-        gap: 60px;
+        gap: 40px;
 
         &-title {
           display: flex;
@@ -157,32 +202,33 @@ const deleteAddress = async (param) => {
         &-mid {
           display: flex;
           flex-direction: column;
-          align-items: center;
           gap: 10px;
           border: 1px solid $dark;
           border-radius: $base-radius;
           padding: $base-padding;
+          inline-size: 500px;
 
-          &-check {
-          margin-bottom: 20px;
-          background-color: rgb(0, 0, 0);
-          color: white;
-          font-family: "Lilita One", cursive;
-          font-size: $base-font-m;
-          padding: 7px;
-
-            h4 {
-              color: rgb(255, 255, 255);
-            }
+          &-title {
+            color: $primary-color;
+            font-family: "Lilita One", cursive;
+            font-size: $base-font-l;
+            padding: 7px;
+            margin-bottom: 10px;
+            text-align: center;
           }
 
-          .trash-icon {
-            font-size: 25px;
-            cursor: pointer;
-            margin-top: 20px;
+          &-name,
+          &-phone,
+          &-country,
+          &-address {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+            color: $dark;
 
-            &:hover {
-              color: $primary-color-dark;
+            h3 {
+              color: black;
             }
           }
         }
@@ -192,11 +238,10 @@ const deleteAddress = async (param) => {
           padding: $base-padding;
           font-size: $base-font-s;
           font-weight: bold;
-          width: 250px;
+          width: 530px;
           background-color: rgb(0, 0, 0);
           cursor: pointer;
-          text-align: center;
-          text-decoration: none;
+          border: none;
 
           &:hover {
             background-color: $dark;
@@ -210,9 +255,9 @@ const deleteAddress = async (param) => {
           display: flex;
           flex-direction: column;
 
-        &-title {
-          margin-bottom: 25px;
-        }
+          &-title {
+            margin-bottom: 25px;
+          }
 
           &-overview {
             display: flex;

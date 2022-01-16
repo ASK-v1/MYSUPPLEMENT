@@ -5,7 +5,6 @@ import router from '../router'
 
 const drawer = ref(false)
 const search = ref('')
-const isLogin = ref(store.getters.isLoggedIn)
 
 const deleteCart = (products) => {
   store.dispatch('deleteCart', products)
@@ -61,7 +60,10 @@ const addQty = (productId, productQty) => {
         </div>
       </div>
       <div class="account-cart">
-        <h4 v-if="isLogin" class="sign-welcome">Welcome {{ store.getters.user.firstName }}</h4>
+        <h4
+          v-if="store.getters.isLoggedIn"
+          class="sign-welcome"
+        >Welcome {{ store.getters.user.firstName }}</h4>
         <router-link v-else to="/signin" class="sign">Sign In/Register</router-link>
         <router-link to="/account" class="account">
           <font-awesome-icon :icon="['fa', 'user']" size="lg" />
@@ -87,12 +89,7 @@ const addQty = (productId, productQty) => {
       </div>
     </div>
   </div>
-  <el-drawer
-    size="20%"
-    lock-scroll="false"
-    show-close="false"
-    v-model="drawer"
-  >
+  <el-drawer size="20%" lock-scroll="false" show-close="false" v-model="drawer">
     <div class="cart-drawer-body">
       <div class="cart-drawer-title-close">
         <div class="cart-drawer-title">
@@ -100,13 +97,22 @@ const addQty = (productId, productQty) => {
         </div>
         <div class="cart-drawer-close" @click="drawer = !drawer">x</div>
       </div>
-      <div v-if="store.getters.cart.length === 0" class="cart-drawer-no-items">THERE ARE NO ITEMS IN YOUR CART</div>
+      <div
+        v-if="store.getters.cart.length === 0"
+        class="cart-drawer-no-items"
+      >THERE ARE NO ITEMS IN YOUR CART</div>
       <div v-for="products in store.getters.cart" :key="products" class="cart-drawer-products">
         <img :src="products.product.img" width="100" height="100" />
         <div class="cart-drawer-products-price-name-qty">
           <div class="cart-drawer-products-name">{{ products.product.name }}</div>
           <div class="cart-drawer-products-price">${{ products.product.price }}</div>
-          <el-input-number @change="addQty(products.product._id, products.qty)" v-model="products.qty" :min="1" :max="products.product.qty" size="mini" />
+          <el-input-number
+            @change="addQty(products.product._id, products.qty)"
+            v-model="products.qty"
+            :min="1"
+            :max="products.product.qty"
+            size="mini"
+          />
         </div>
         <font-awesome-icon
           @click="deleteCart(products)"

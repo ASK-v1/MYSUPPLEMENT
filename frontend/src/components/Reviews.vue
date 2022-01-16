@@ -52,13 +52,7 @@ sum.value = (sum.value /= reviews.value.length).toFixed(1)
         <div v-if="!isNaN(sum)" class="reviews-ratings-score-title">{{ sum }}</div>
         <div v-else class="reviews-ratings-score-title">0</div>
         <div class="reviews-ratings-score-star">
-          <el-rate
-            v-if="!isNaN(sum)"
-            v-model="sum"
-            disabled
-            show-score
-            text-color="#ff9900"
-          ></el-rate>
+          <el-rate v-if="!isNaN(sum)" v-model="sum" disabled show-score text-color="#ff9900"></el-rate>
         </div>
         <div class="reviews-ratings-score-number">{{ reviews.length }} Reviews</div>
       </div>
@@ -107,12 +101,7 @@ sum.value = (sum.value /= reviews.value.length).toFixed(1)
           <h3>{{ review.nickname }}</h3>
         </div>
         <div class="reviews-field-left-rating">
-          <el-rate
-            v-model="review.rating"
-            disabled
-            show-score
-            text-color="#ff9900"
-          ></el-rate>
+          <el-rate v-model="review.rating" disabled show-score text-color="#ff9900"></el-rate>
         </div>
         <div class="reviews-field-left-date">
           <h5>{{ review.date }}</h5>

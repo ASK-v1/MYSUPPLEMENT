@@ -2,16 +2,16 @@
   <div class="content">
     <div class="content-list">
       <div class="top">
-        <img src="../assets/images/top.png">
+        <img src="../assets/images/top.png" />
         <h3>Top Rated and Reviewed</h3>
         <p></p>
       </div>
       <div class="authentic">
-        <img src="../assets/images/auth.png">
+        <img src="../assets/images/auth.png" />
         <h3>100% Authentic Products</h3>
       </div>
       <div class="fast">
-        <img src="../assets/images/ship.png">
+        <img src="../assets/images/ship.png" />
         <h3>Fast Delivery Service</h3>
       </div>
     </div>
@@ -35,7 +35,9 @@
     color: $dark;
     font-size: $base-font-m;
 
-    .top, .authentic, .fast {
+    .top,
+    .authentic,
+    .fast {
       background-color: white;
       padding: 50px;
       border-radius: 20px;

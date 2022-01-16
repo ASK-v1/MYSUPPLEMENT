@@ -41,12 +41,7 @@ store.getters.products.forEach((product, key) => {
             <h3>{{ best.name }}</h3>
           </div>
           <div class="best-products-items-rating">
-            <el-rate
-              v-model="ratings[key]"
-              disabled
-              show-score
-              text-color="#ff9900"
-            ></el-rate>
+            <el-rate v-model="ratings[key]" disabled show-score text-color="#ff9900"></el-rate>
           </div>
           <div class="best-products-items-price">
             <h2>${{ best.price }}</h2>

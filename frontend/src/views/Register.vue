@@ -37,7 +37,13 @@ const register = async () => {
       <h1>REGISTER</h1>
     </div>
     <div class="register-main">
-      <el-alert class="error" v-if="this.showError" title="Email is invalid or already taken" type="error" effect="dark"> </el-alert>
+      <el-alert
+        class="error"
+        v-if="this.showError"
+        title="Email is invalid or already taken"
+        type="error"
+        effect="dark"
+      ></el-alert>
       <form class="register-form" @submit.prevent="register">
         <div class="register-firstname">
           <label for="firstname">First Name:</label>
@@ -63,6 +69,7 @@ const register = async () => {
       </div>
     </div>
   </div>
+  <div v-loading.fullscreen.lock="store.getters.status === 'loading'" />
 </template>
 
 <style lang="scss">

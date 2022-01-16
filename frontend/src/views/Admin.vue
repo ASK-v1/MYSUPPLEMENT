@@ -3,8 +3,6 @@ import { ref, reactive } from 'vue'
 import store from '../store'
 import router from '../router'
 
-(store.state.userData.email === 'admin@gmail.com') ? router.push('/admin') : router.push('/')
-
 const order = ref(false)
 const products = ref(true)
 
@@ -75,16 +73,11 @@ const logout = async () => {
     </div>
     <div class="order-products">
       <div v-if="order" class="order">
-        <h1>order list </h1>
+        <h1>order list</h1>
       </div>
       <div v-if="products" class="products">
         <button class="products-button" @click="addProduct.dialogFormVisible = true">ADD NEW</button>
-        <el-dialog
-          v-model="addProduct.dialogFormVisible"
-          width="30%"
-          center
-          title="ADD NEW"
-        >
+        <el-dialog v-model="addProduct.dialogFormVisible" width="30%" center title="ADD NEW">
           <el-form :model="addProduct.form">
             <el-form-item label="Brand" :label-width="addProduct.formLabelWidth">
               <el-input v-model="addProduct.form.brand" autocomplete="off"></el-input>
@@ -126,7 +119,9 @@ const logout = async () => {
         </el-dialog>
         <div v-for="product in store.getters.products" :key="product" class="products-items">
           <div class="products-items-qty">{{ product.qty }}</div>
-          <div class="products-items-img"><img :src="product.img" width="100"></div>
+          <div class="products-items-img">
+            <img :src="product.img" width="100" />
+          </div>
           <div class="products-items-name-brand">
             <div class="products-items-brand">{{ product.brand }}</div>
             <div class="products-items-name">{{ product.name }}</div>
@@ -142,6 +137,7 @@ const logout = async () => {
       </div>
     </div>
   </div>
+  <div v-loading.fullscreen.lock="store.getters.status === 'loading'" />
 </template>
 
 <style lang="scss">

@@ -52,8 +52,13 @@ const addCart = () => {
           <el-breadcrumb-item :to="{ path: '/products' }">Products</el-breadcrumb-item>
           <el-breadcrumb-item>{{ product.brand }}</el-breadcrumb-item>
         </el-breadcrumb>
-        <div class="product-body-image">
-          <img :src="product.img" width="320" height="320" />
+        <div
+          v-bind:class="{
+            'product-body-bc-img-image': product.qty !== 0,
+            'product-body-bc-img-image-soldout': product.qty === 0
+          }"
+        >
+          <img :src="product.img" width="350" height="350" />
         </div>
       </div>
       <div class="product-body-items">
@@ -64,12 +69,7 @@ const addCart = () => {
           <h2>{{ product.name }}</h2>
         </div>
         <div class="products-body-items-rating">
-          <el-rate
-            v-model="sum"
-            disabled
-            show-score
-            text-color="#ff9900"
-          ></el-rate>
+          <el-rate v-model="sum" disabled show-score text-color="#ff9900"></el-rate>
         </div>
         <div class="product-body-items-info">{{ product.info }}</div>
       </div>
@@ -81,8 +81,7 @@ const addCart = () => {
       show-icon
       effect="dark"
       center
-    >
-    </el-alert>
+    ></el-alert>
     <el-alert
       v-if="showSuccess"
       title="Added to your cart"
@@ -90,20 +89,14 @@ const addCart = () => {
       show-icon
       effect="dark"
       center
-    >
-    </el-alert>
-    <div class="product-bar">
+    ></el-alert>
+    <div v-if="product.qty !== 0" class="product-bar">
       <div class="product-bar-price">${{ product.price }}</div>
       <div class="product-bar-size">{{ product.servings }} Servings</div>
       <div class="product-bar-flavor">
         <h4>Flavor</h4>
         <el-select v-model="flavor" placeholder="Select">
-          <el-option
-            v-for="item in flavors"
-            :key="item"
-            :label="item"
-            :value="item"
-          ></el-option>
+          <el-option v-for="item in flavors" :key="item" :label="item" :value="item"></el-option>
         </el-select>
       </div>
       <div class="product-bar-qty">
@@ -112,6 +105,9 @@ const addCart = () => {
       </div>
       <button class="product-bar-button" @click="addCart">ADD TO CART</button>
     </div>
+    <div v-else class="product-bar">
+      <h1>SOLD OUT</h1>
+    </div>
     <div class="product-reviews">
       <Reviews></Reviews>
     </div>
@@ -119,6 +115,7 @@ const addCart = () => {
       <Footer />
     </div>
   </div>
+  <div v-loading.fullscreen.lock="store.getters.status === 'loading'" />
 </template>
 
 <style lang="scss">
@@ -138,9 +135,12 @@ const addCart = () => {
       display: flex;
       align-items: center;
       flex-direction: column;
-    }
-    &-image {
-      margin-left: 300px;
+
+      &-image {
+        &-soldout {
+          filter: grayscale(100%);
+        }
+      }
     }
 
     &-items {
@@ -175,6 +175,12 @@ const addCart = () => {
     padding-bottom: 50px;
     background-color: $primary-color;
     margin-bottom: 150px;
+
+    h1 {
+      font-family: "Lilita One", cursive;
+      color: white;
+      margin-top: 10px;
+    }
 
     &-price,
     &-size {

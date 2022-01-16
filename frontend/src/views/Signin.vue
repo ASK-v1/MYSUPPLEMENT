@@ -34,7 +34,13 @@ const login = async () => {
       <h1>SIGN IN</h1>
     </div>
     <div class="signin-main">
-      <el-alert class="error" v-if="this.showError" title="Incorrect email or password" type="error" effect="dark"> </el-alert>
+      <el-alert
+        class="error"
+        v-if="this.showError"
+        title="Incorrect email or password"
+        type="error"
+        effect="dark"
+      ></el-alert>
       <form class="signin-form" @submit.prevent="login">
         <div class="signin-email">
           <label for="email">Email:</label>
@@ -52,6 +58,7 @@ const login = async () => {
       </div>
     </div>
   </div>
+  <div v-loading.fullscreen.lock="store.getters.status === 'loading'" />
 </template>
 
 <style lang="scss">

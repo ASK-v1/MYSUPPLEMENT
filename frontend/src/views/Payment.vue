@@ -5,14 +5,26 @@ import { ref } from 'vue'
 import store from '../store'
 import router from '../router'
 
-(store.getters.step === 'address') ? router.push('/payment') : router.push('/')
-
 const active = ref(3)
 const cardNumber = ref('')
 const NameOnCard = ref('')
 const expiryDate = ref('')
 const cvc = ref('')
 const checked1 = ref('')
+
+const placeOrder = async () => {
+  const data = {
+    userId: store.getters.user._id,
+    order: store.getters.cart,
+    address: store.getters.user.address.filter(address => address.selected === true)[0]
+  }
+  try {
+    await store.dispatch('placeOrder', data)
+    router.push('/')
+  } catch (error) {
+    console.log(error)
+  }
+}
 </script>
 
 <template>
@@ -65,16 +77,20 @@ const checked1 = ref('')
               <br />& Privacy Policy of this online store.
             </h4>
           </el-checkbox>
-          <router-link class="payment-body-items-left-button" to="/payment">
+          <button @click="placeOrder" class="payment-body-items-left-button">
             <h2>PLACE MY ORDER</h2>
-          </router-link>
+          </button>
         </div>
         <div class="payment-body-items-right">
           <div class="payment-body-items-right-summary">
             <div class="payment-body-items-right-summary-title">
               <h2>ORDER SUMMARY</h2>
             </div>
-            <div v-for="products in store.getters.cart" :key="products" class="payment-body-items-right-summary-content">
+            <div
+              v-for="products in store.getters.cart"
+              :key="products"
+              class="payment-body-items-right-summary-content"
+            >
               <img
                 class="payment-body-items-right-summary-content-image"
                 :src="products.product.img"
@@ -85,11 +101,13 @@ const checked1 = ref('')
                 <div class="payment-body-items-right-summary-content-mid-brand">
                   <h4>{{ products.product.brand }}</h4>
                 </div>
-                <div class="payment-body-items-right-summary-content-mid-name">{{ products.product.name }}</div>
+                <div
+                  class="payment-body-items-right-summary-content-mid-name"
+                >{{ products.product.name }}</div>
               </div>
-                <div class="payment-body-items-right-summary-content-mid-qty">
-                  <h5>Qty: {{ products.qty }}</h5>
-                </div>
+              <div class="payment-body-items-right-summary-content-mid-qty">
+                <h5>Qty: {{ products.qty }}</h5>
+              </div>
             </div>
             <div class="payment-body-items-right-summary-overview">
               <div class="payment-body-items-right-summary-overview-items">
@@ -117,6 +135,7 @@ const checked1 = ref('')
       <Footer />
     </div>
   </div>
+  <div v-loading.fullscreen.lock="store.getters.status === 'loading'" />
 </template>
 
 <style lang="scss">
@@ -144,7 +163,7 @@ const checked1 = ref('')
 
     &-items {
       display: flex;
-      gap: 178px;
+      gap: 233px;
 
       &-left {
         display: flex;
@@ -217,11 +236,11 @@ const checked1 = ref('')
           padding: $base-padding;
           font-size: $base-font-s;
           font-weight: bold;
-          width: 475px;
+          width: 500px;
           background-color: rgb(0, 0, 0);
+          border: 1px solid black;
           cursor: pointer;
-          text-align: center;
-          text-decoration: none;
+          border: none;
 
           &:hover {
             background-color: $dark;
@@ -235,9 +254,9 @@ const checked1 = ref('')
           display: flex;
           flex-direction: column;
 
-        &-title {
-          margin-bottom: 25px;
-        }
+          &-title {
+            margin-bottom: 25px;
+          }
           &-overview {
             display: flex;
             flex-direction: column;

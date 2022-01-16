@@ -3,13 +3,14 @@ import Navbar from '../components/Navbar.vue'
 import Footer from '../components/Footer.vue'
 import { ref } from 'vue'
 import store from '../store'
+import router from '../router'
 
-store.state.step = 'cart'
 const active = ref(1)
 const deliveryCost = 20
 
 const deleteCart = (products) => {
   store.dispatch('deleteCart', products)
+  if (store.getters.cart.length === 0) router.push('/')
 }
 
 const addQty = (productId, productQty) => {
@@ -39,7 +40,11 @@ const addQty = (productId, productQty) => {
       </div>
       <div class="cart-body-items">
         <div class="cart-body-items-el">
-          <div v-for="products in store.getters.cart" :key="products"   class="cart-body-items-el-left">
+          <div
+            v-for="products in store.getters.cart"
+            :key="products"
+            class="cart-body-items-el-left"
+          >
             <div class="cart-body-items-el-left-image">
               <img :src="products.product.img" width="150" height="150" />
             </div>
@@ -50,7 +55,13 @@ const addQty = (productId, productQty) => {
               <div class="cart-body-items-el-left-name">{{ products.product.name }}</div>
             </div>
             <div class="cart-body-items-el-left-qty">
-              <el-input-number @change="addQty(products.product._id, products.qty)" v-model="products.qty" :min="1" :max="products.product.qty" size="large" />
+              <el-input-number
+                @change="addQty(products.product._id, products.qty)"
+                v-model="products.qty"
+                :min="1"
+                :max="products.product.qty"
+                size="large"
+              />
             </div>
             <font-awesome-icon
               @click="deleteCart(products)"
@@ -63,7 +74,7 @@ const addQty = (productId, productQty) => {
         <div class="cart-body-items-right">
           <div class="cart-body-items-right-overview">
             <h3>OVERVIEW</h3>
-            <h4>{{ store.getters.cart.length }}</h4>
+            <h4>{{ store.getters.cart.length }} ITEMS</h4>
           </div>
           <div class="cart-body-items-right-subtotal">
             <h5>SUBTOTAL</h5>
@@ -82,7 +93,7 @@ const addQty = (productId, productQty) => {
               <h2>PROCEED TO CHECKOUT</h2>
             </router-link>
             <router-link class="continue" to="/">
-              <h2>CONTİNUE SHOPPING</h2>
+              <h2>CONTINUE SHOPPING</h2>
             </router-link>
           </div>
         </div>
