@@ -8,7 +8,6 @@ const firstName = ref('')
 const lastName = ref('')
 const password = ref('')
 const email = ref('')
-
 const showError = ref(false)
 
 const register = async () => {
@@ -22,8 +21,8 @@ const register = async () => {
     await store.dispatch('registerUser', user)
     router.push('signin')
   } catch (error) {
-    showError.value = true
     console.log(error)
+    showError.value = true
   }
 }
 </script>
@@ -39,7 +38,7 @@ const register = async () => {
     <div class="register-main">
       <el-alert
         class="error"
-        v-if="this.showError"
+        v-if="showError"
         title="Email is invalid or already taken"
         type="error"
         effect="dark"
@@ -69,7 +68,6 @@ const register = async () => {
       </div>
     </div>
   </div>
-  <div v-loading.fullscreen.lock="store.getters.status === 'loading'" />
 </template>
 
 <style lang="scss">

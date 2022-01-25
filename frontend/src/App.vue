@@ -1,7 +1,5 @@
 <template>
-  <div class="app">
-    <router-view />
-  </div>
+  <router-view />
 </template>
 
 <style lang="scss">
@@ -14,7 +12,5 @@
 
 #app {
   font-family: "Nunito Sans", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 </style>

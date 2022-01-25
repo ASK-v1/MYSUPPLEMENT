@@ -4,21 +4,15 @@ import createPersistedState from 'vuex-persistedstate'
 
 export default createStore({
   state: {
+    token: '',
     cart: [],
-    status: '',
-    token: localStorage.getItem('token') || '',
-    userData: {},
-    products: {}
+    userData: [],
+    products: [],
+    category: [],
+    ratings: []
   },
   mutations: {
-    REQUEST (state) {
-      state.status = 'loading'
-    },
-    SUCCESS (state) {
-      state.status = 'success'
-    },
-    AUTH_SUCCESS (state, payload) {
-      state.status = 'success'
+    USER_AUTH (state, payload) {
       state.token = payload
     },
     USER_DATA (state, payload) {
@@ -26,96 +20,98 @@ export default createStore({
     },
     PRODUCT_DATA (state, payload) {
       state.products = payload
+      state.cart.forEach((cart) => {
+        payload.forEach((p) => {
+          if (cart.product._id === p._id) cart.product.qty = p.qty
+        })
+      })
     },
     LOGOUT (state) {
-      state.status = ''
       state.token = ''
       state.userData = ''
     },
     ADD_TO_CART (state, payload) {
-      const inCart = state.cart.find(item => { return item.product._id === payload.product._id })
+      const inCart = state.cart.find((item) => item.product._id === payload.product._id)
       if (inCart) inCart.qty += payload.qty
       else state.cart.push(payload)
     },
     DELETE_CART (state, payload) {
-      const index = state.cart.map(item => item.product._id).indexOf(payload.product._id)
+      const index = state.cart
+        .map((item) => item.product._id)
+        .indexOf(payload.product._id)
       state.cart.splice(index, 1)
     },
     ADD_QTY (state, payload) {
-      const inCart = state.cart.find(item => { return item.product._id === payload.id })
+      const inCart = state.cart.find((item) => item.product._id === payload.id)
       inCart.qty = payload.qty
     },
     CLEAR (state) {
       state.cart = []
+    },
+    CATEGORY (state, payload) {
+      state.category = payload
+    },
+    PRODUCT_RATINGS (state, payload) {
+      let sum = 0
+      payload.forEach((product, key) => {
+        if (product.review.length) {
+          product.review.forEach((review) => {
+            sum += review.rating
+          })
+          sum = (sum /= product.review.length).toFixed(1)
+          state.ratings[key] = sum
+          sum = 0
+        } else sum = 0
+      })
     }
   },
   actions: {
     async loginUser ({ commit }, user) {
-      commit('REQUEST')
       const { data } = await axios.post('http://localhost:3000/users/login', user)
-      const { token, userData } = data
-      localStorage.setItem('token', token)
+      const { userData, token } = data
+      commit('USER_AUTH', token)
       commit('USER_DATA', userData)
-      commit('AUTH_SUCCESS', token)
     },
     async registerUser ({ commit }, user) {
-      commit('REQUEST')
       await axios.post('http://localhost:3000/users/register', user)
-      commit('SUCCESS')
     },
     async logoutUser ({ commit }) {
-      localStorage.removeItem('token')
       commit('LOGOUT')
     },
     async getAddress ({ commit }, userId) {
-      commit('REQUEST')
       const { data } = await axios.get(`http://localhost:3000/users/address/get/${userId}`)
       const { userData } = data
       commit('USER_DATA', userData)
-      commit('SUCCESS')
     },
     async saveAddress ({ commit }, save) {
-      commit('REQUEST')
       await axios.put('http://localhost:3000/users/address/save', save)
       await this.dispatch('getAddress', this.getters.user._id)
-      commit('SUCCESS')
     },
     async deleteAddress ({ commit }, data) {
-      commit('REQUEST')
       await axios.delete(`http://localhost:3000/users/address/delete/${data.userId}/${data.addr}`)
       await this.dispatch('getAddress', this.getters.user._id)
-      commit('SUCCESS')
     },
     async getProduct ({ commit }) {
-      commit('REQUEST')
       const { data } = await axios.get('http://localhost:3000/products/get')
       const { productData } = data
       commit('PRODUCT_DATA', productData)
-      commit('SUCCESS')
+      commit('PRODUCT_RATINGS', productData)
     },
     async addProduct ({ commit }, product) {
-      commit('REQUEST')
       await axios.post('http://localhost:3000/products/add', product)
       await this.dispatch('getProduct')
-      commit('SUCCESS')
     },
     async deleteProduct ({ commit }, productId) {
-      commit('REQUEST')
       await axios.delete(`http://localhost:3000/products/delete/${productId}`)
       await this.dispatch('getProduct')
-      commit('SUCCESS')
     },
     async addReview ({ commit }, review) {
-      commit('REQUEST')
       await axios.put('http://localhost:3000/products/review', review)
       await this.dispatch('getProduct')
-      commit('SUCCESS')
     },
     async selectAddress ({ commit }, select) {
-      commit('REQUEST')
       await axios.put('http://localhost:3000/users/select', select)
       await this.dispatch('getAddress', this.getters.user._id)
-      commit('SUCCESS')
     },
     addToCart ({ commit }, product) {
       commit('ADD_TO_CART', product)
@@ -127,24 +123,30 @@ export default createStore({
       commit('ADD_QTY', product)
     },
     async placeOrder ({ commit }, orderSummary) {
-      commit('REQUEST')
       await axios.put('http://localhost:3000/products/order', orderSummary)
       await axios.put('http://localhost:3000/users/order', orderSummary)
+      await axios.put('http://localhost:3000/users/admin', orderSummary)
       await this.dispatch('getAddress', this.getters.user._id)
-      await this.dispatch('getProduct')
       commit('CLEAR')
-      commit('SUCCESS')
+    },
+    async getCategory ({ commit }, products) {
+      const { data } = await axios.get(`http://localhost:3000/products/get/${products.category}`)
+      await this.dispatch('getProduct')
+      const { productData } = data
+      commit('CATEGORY', productData)
     }
   },
   getters: {
-    isLoggedIn: state => !!state.token,
-    status: state => state.status,
-    user: state => state.userData,
-    products: state => state.products,
-    cart: state => state.cart,
+    isLoggedIn: (state) => !!state.token,
+    user: (state) => state.userData,
+    products: (state) => state.products,
+    category: (state) => state.category,
+    cart: (state) => state.cart,
     totalPrice: (state) => {
       let total = 0
-      state.cart.forEach(item => { total += (item.product.price * item.qty) })
+      state.cart.forEach((item) => {
+        total += item.product.price * item.qty
+      })
       return total.toFixed(2)
     }
   },

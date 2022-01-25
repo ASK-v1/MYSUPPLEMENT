@@ -1,28 +1,15 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted } from 'vue'
 import store from '../store/index.js'
 
-const getProduct = async () => {
-  try {
-    await store.dispatch('getProduct')
-  } catch (error) {
-    console.log(error)
-  }
-}
-getProduct()
-
-const ratings = ref([])
-const sum = ref(0)
-
-store.getters.products.forEach((product, key) => {
-  if (product.review.length) {
-    product.review.forEach((review) => {
-      sum.value += review.rating
-    })
-    sum.value = (sum.value /= product.review.length).toFixed(1)
-    ratings.value[key] = sum.value
-    sum.value = 0
-  } else sum.value = 0
+onMounted(() => {
+  (async () => {
+    try {
+      await store.dispatch('getProduct')
+    } catch (error) {
+      console.log(error)
+    }
+  })()
 })
 </script>
 
@@ -41,7 +28,7 @@ store.getters.products.forEach((product, key) => {
             <h3>{{ best.name }}</h3>
           </div>
           <div class="best-products-items-rating">
-            <el-rate v-model="ratings[key]" disabled show-score text-color="#ff9900"></el-rate>
+            <el-rate v-model="store.state.ratings[key]" disabled show-score text-color="#ff9900"></el-rate>
           </div>
           <div class="best-products-items-price">
             <h2>${{ best.price }}</h2>
@@ -78,8 +65,9 @@ store.getters.products.forEach((product, key) => {
     align-items: center;
     justify-content: center;
     text-align: center;
-    margin: 0 15% 0 15%;
     gap: 25px;
+    width: 1300px;
+    margin: auto;
 
     &-items {
       display: flex;

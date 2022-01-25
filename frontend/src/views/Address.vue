@@ -9,8 +9,10 @@ import router from '../router'
 const active = ref(2)
 const deliveryCost = 20
 const showError = ref(false)
+const loading = ref(false)
 
 const selectAddress = async (address) => {
+  loading.value = true
   const data = {
     userId: store.getters.user._id,
     selectId: address.id,
@@ -18,8 +20,10 @@ const selectAddress = async (address) => {
   }
   try {
     await store.dispatch('selectAddress', data)
+    loading.value = false
   } catch (error) {
     console.log(error)
+    loading.value = false
   }
 }
 
@@ -53,7 +57,7 @@ const addressCheck = () => {
           </div>
           <el-alert
             class="error"
-            v-if="this.showError"
+            v-if="showError"
             title="Please select address"
             type="error"
             effect="dark"
@@ -123,7 +127,7 @@ const addressCheck = () => {
                 >{{ products.product.name }}</div>
               </div>
               <div class="address-body-items-right-summary-content-mid-qty">
-                <h5>Qty: {{ products.qty }}</h5>
+                <h5>{{ products.qty }}</h5>
               </div>
             </div>
             <div class="address-body-items-right-summary-overview">
@@ -152,7 +156,7 @@ const addressCheck = () => {
       <Footer />
     </div>
   </div>
-  <div v-loading.fullscreen.lock="store.getters.status === 'loading'" />
+  <div v-loading.fullscreen.lock="loading === true" />
 </template>
 
 <style lang="scss">
@@ -296,6 +300,18 @@ const addressCheck = () => {
               display: flex;
               flex-direction: column;
               gap: 10px;
+
+              &-qty {
+                background-color: black;
+                color: white;
+                padding: 7px;
+                text-align: center;
+                height: 27px;
+                width: 27px;
+                font-weight: 600;
+                border-radius: 27px;
+                font-size: $base-font-l;
+              }
 
               &-name {
                 inline-size: 250px;

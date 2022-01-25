@@ -2,9 +2,17 @@
 import { ref } from 'vue'
 import store from '../store'
 import router from '../router'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
 const drawer = ref(false)
 const search = ref('')
+
+const sleep = (delay = 0) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, delay)
+  })
+}
 
 const deleteCart = (products) => {
   store.dispatch('deleteCart', products)
@@ -15,7 +23,8 @@ const products = ref(store.getters.products.map(p => ({
   link: p._id
 })))
 
-const querySearch = (queryString, cb) => {
+const querySearch = async (queryString, cb) => {
+  await sleep(1000)
   const results = products.value.filter(createFilter(queryString))
   cb(results)
 }
@@ -36,6 +45,17 @@ const addQty = (productId, productQty) => {
     qty: productQty
   }
   store.dispatch('addQty', data)
+}
+
+const getProduct = async (param) => {
+  const data = {
+    category: param
+  }
+  try {
+    await store.dispatch('getCategory', data)
+  } catch (error) {
+    console.log(error)
+  }
 }
 </script>
 
@@ -69,10 +89,10 @@ const addQty = (productId, productQty) => {
           <font-awesome-icon :icon="['fa', 'user']" size="lg" />
         </router-link>
         <div class="cart-icon">
-          <a @click="drawer = true" class="cart">
+          <a @click="drawer = route.name !== 'Payment'" class="cart">
             <font-awesome-icon :icon="['fa', 'shopping-cart']" size="lg" />
           </a>
-          <div @click="drawer = true" class="cart-count">
+          <div @click="drawer = route.name !== 'Payment'" class="cart-count">
             <p>{{ store.getters.cart.length }}</p>
           </div>
         </div>
@@ -80,12 +100,12 @@ const addQty = (productId, productQty) => {
     </div>
     <div class="navbar-buttons">
       <div class="buttons">
-        <router-link to="/products" class="nav-button">PROTEIN</router-link>
-        <router-link to="/products" class="nav-button">VITAMINS</router-link>
-        <router-link to="/products" class="nav-button">ENERGY</router-link>
-        <router-link to="/products" class="nav-button">CREATINE</router-link>
-        <router-link to="/products" class="nav-button">AMINO ACIDS</router-link>
-        <router-link to="/products" class="nav-button">MUSCLE BOOSTERS</router-link>
+        <router-link @click="getProduct('protein')" to="/products/protein" class="nav-button">PROTEIN</router-link>
+        <router-link @click="getProduct('vitamin')" to="/products/vitamin" class="nav-button">VITAMINS</router-link>
+        <router-link @click="getProduct('energy')" to="/products/energy" class="nav-button">ENERGY</router-link>
+        <router-link @click="getProduct('creatine')" to="/products/creatine" class="nav-button">CREATINE</router-link>
+        <router-link @click="getProduct('amino')" to="/products/amino" class="nav-button">AMINO ACIDS</router-link>
+        <router-link @click="getProduct('booster')" to="/products/booster" class="nav-button">MUSCLE BOOSTERS</router-link>
       </div>
     </div>
   </div>
@@ -338,20 +358,19 @@ const addQty = (productId, productQty) => {
         justify-content: center;
 
         &-cart {
-          color: rgb(0, 0, 0);
+          color: rgb(255, 255, 255);
           padding: $base-padding;
           font-size: $base-font-s;
           box-shadow: $base-shadow;
           font-weight: bold;
-          border: 1px solid black;
           width: 150px;
-          background-color: rgb(255, 255, 255);
+          background-color: rgb(0, 0, 0);
           cursor: pointer;
           text-align: center;
           text-decoration: none;
 
           &:hover {
-            background-color: rgb(200, 200, 200);
+            background-color: $dark;
             transition: all 0.3s ease-in-out 0s;
           }
         }

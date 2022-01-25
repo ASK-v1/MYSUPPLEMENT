@@ -13,13 +13,9 @@ const switchOrderAddress = () => {
   addresses.value = !addresses.value
 }
 
-const logout = async () => {
-  try {
-    await store.dispatch('logoutUser')
-    router.push('/')
-  } catch (error) {
-    console.log(error)
-  }
+const logout = () => {
+  store.dispatch('logoutUser')
+  router.push('/')
 }
 
 const deleteAddress = async (address) => {
@@ -33,7 +29,6 @@ const deleteAddress = async (address) => {
     console.log(error)
   }
 }
-
 </script>
 
 <template>
@@ -55,34 +50,41 @@ const deleteAddress = async (address) => {
       <div class="order-addresses">
         <div v-if="order" class="order">
           <h3 v-if="!store.getters.user">You don't have any orders yet!</h3>
-          <div v-for="order in store.user" :key="order" class="order-items">
-            <img class="order-items-image" :src="order.img" width="100" height="100" />
-            <div class="order-items-mid">
-              <div class="order-items-image-mid-brand">
-                <h4>{{ products.product.brand }}</h4>
+          <div v-for="items in store.getters.user.orderHistory.reverse()" :key="items" class="order-items">
+            <div class="order-date">
+              <h3>{{ items.date }}</h3>
+            </div>
+            <div v-for="order in items.order" :key="order">
+              <div class="order-items-upper">
+                <img class="order-items-upper-image" :src="order.img" width="100" height="100" />
+                <div class="order-items-upper-mid">
+                  <div class="order-items-upper-mid-brand">
+                    <h4>{{ order.brand }}</h4>
+                  </div>
+                  <div class="order-items-upper-mid-name">{{ order.name }}</div>
+                </div>
+                <div class="order-items-upper-qty">
+                  <h5>{{ order.qty }}</h5>
+                </div>
               </div>
-              <div class="order-items-mid-name">{{ products.product.name }}</div>
-              <div class="order-items-qty">
-                <h5>Qty: {{ products.qty }}</h5>
+            </div>
+            <div class="order-items-overview">
+              <div class="order-items-overview-item">
+                <h3>OVERVIEW</h3>
+                <h4>{{ items.order.length }} ITEMS</h4>
               </div>
-            </div>
-          </div>
-          <div class="order-items-overview">
-            <div class="order-items-overview-item">
-              <h3>OVERVIEW</h3>
-              <h4>{{ store.getters.cart.length }} ITEMS</h4>
-            </div>
-            <div class="order-items-overview-subtotal">
-              <h5>SUBTOTAL</h5>
-              <h5>${{ store.getters.totalPrice }}</h5>
-            </div>
-            <div class="order-items-overview-delivery">
-              <h5>DELIVERY COST</h5>
-              <h5>$20</h5>
-            </div>
-            <div class="order-items-overview-ordertotal">
-              <h3>ORDER TOTAL</h3>
-              <h4>${{ (parseFloat(store.getters.totalPrice) + 20).toFixed(2) }}</h4>
+              <div class="order-items-overview-subtotal">
+                <h5>SUBTOTAL</h5>
+                <h5>${{ parseFloat(items.order[0].totalPrice).toFixed(2) }}</h5>
+              </div>
+              <div class="order-items-overview-delivery">
+                <h5>DELIVERY COST</h5>
+                <h5>$20</h5>
+              </div>
+              <div class="order-items-overview-ordertotal">
+                <h3>ORDER TOTAL</h3>
+                <h4>${{ (parseFloat(items.order[0].totalPrice) + 20).toFixed(2) }}</h4>
+              </div>
             </div>
           </div>
         </div>
@@ -133,7 +135,6 @@ const deleteAddress = async (address) => {
       </div>
     </div>
   </div>
-  <div v-loading.fullscreen.lock="store.getters.status === 'loading'" />
 </template>
 
 <style lang="scss">
@@ -183,14 +184,100 @@ const deleteAddress = async (address) => {
         transition: all 0.3s ease-in-out 0s;
       }
     }
+
     .addresses-active,
     .order-active {
       color: white;
       background-color: black;
     }
   }
+
   .order-addresses {
-    .order,
+    .order {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px;
+      width: 800px;
+      background-color: white;
+      margin-top: 60px;
+      gap: 30px;
+      border-radius: $base-radius;
+
+      &-date {
+        background-color: $dark;
+        padding: 5px;
+        border-top-right-radius: $base-radius;
+        border-top-left-radius: $base-radius;
+        color: rgb(255, 255, 255);
+        font-weight: bolder;
+        font-family: "Lilita One", cursive;
+      }
+
+      &-items {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid black;
+        gap: 40px;
+        border-radius: $base-radius;
+        inline-size: 500px;
+        text-align: center;
+
+        &-upper {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          margin: 0 10px 0 10px;
+
+          &-mid {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+
+            &-brand {
+              color: rgb(0, 0, 0);
+              font-family: "Lilita One", cursive;
+              font-size: $base-font-s;
+            }
+          }
+
+          &-qty {
+            background-color: black;
+            color: white;
+            padding: 7px;
+            height: 27px;
+            width: 27px;
+            font-weight: 600;
+            border-radius: 27px;
+            font-size: $base-font-l;
+            margin-top: 10px;
+          }
+        }
+
+        &-overview {
+          padding: $base-padding;
+          border-bottom-right-radius: $base-radius;
+          border-bottom-left-radius: $base-radius;
+          background-color: $primary-color;
+          color: white;
+          font-weight: bolder;
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+
+          & > * {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 60px;
+          }
+        }
+      }
+    }
+
     .addresses {
       display: flex;
       flex-direction: column;

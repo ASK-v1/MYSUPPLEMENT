@@ -6,7 +6,6 @@ import router from '../router'
 
 const email = ref('')
 const password = ref('')
-
 const showError = ref(false)
 
 const login = async () => {
@@ -19,8 +18,8 @@ const login = async () => {
     if (store.state.userData.email === 'admin@gmail.com') router.push('admin')
     else router.push('/')
   } catch (error) {
-    showError.value = true
     console.log(error)
+    showError.value = true
   }
 }
 </script>
@@ -36,7 +35,7 @@ const login = async () => {
     <div class="signin-main">
       <el-alert
         class="error"
-        v-if="this.showError"
+        v-if="showError"
         title="Incorrect email or password"
         type="error"
         effect="dark"
@@ -58,7 +57,6 @@ const login = async () => {
       </div>
     </div>
   </div>
-  <div v-loading.fullscreen.lock="store.getters.status === 'loading'" />
 </template>
 
 <style lang="scss">

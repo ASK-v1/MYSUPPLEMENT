@@ -11,18 +11,36 @@ const NameOnCard = ref('')
 const expiryDate = ref('')
 const cvc = ref('')
 const checked1 = ref('')
+const date = new Date()
+const loading = ref(false)
+const showError = ref(false)
 
 const placeOrder = async () => {
-  const data = {
-    userId: store.getters.user._id,
-    order: store.getters.cart,
-    address: store.getters.user.address.filter(address => address.selected === true)[0]
-  }
+  loading.value = true
   try {
+    await store.dispatch('getProduct')
+    const data = {
+      userId: store.getters.user._id,
+      order: store.getters.cart.map((items) => ({
+        id: items.product._id,
+        brand: items.product.brand,
+        name: items.product.name,
+        img: items.product.img,
+        total: items.product.qty,
+        qty: items.qty,
+        totalPrice: parseFloat((store.getters.totalPrice) + 20).toFixed(2)
+      })),
+      address: store.getters.user.address.filter(address => address.selected === true)[0],
+      date: date.toLocaleDateString()
+    }
     await store.dispatch('placeOrder', data)
+    await store.dispatch('getProduct')
+    loading.value = false
     router.push('/')
   } catch (error) {
     console.log(error)
+    showError.value = true
+    loading.value = false
   }
 }
 </script>
@@ -49,6 +67,7 @@ const placeOrder = async () => {
             <font-awesome-icon class="card-icon" :icon="['fa', 'credit-card']" color="#5000b5" />
             <h3>Credit Card</h3>
           </div>
+          <el-alert class="error" v-if="showError" title="ERROR" type="error" effect="dark"></el-alert>
           <div class="payment-body-items-left-card">
             <form class="card-form" action="submit">
               <div class="card-form-number">
@@ -106,7 +125,7 @@ const placeOrder = async () => {
                 >{{ products.product.name }}</div>
               </div>
               <div class="payment-body-items-right-summary-content-mid-qty">
-                <h5>Qty: {{ products.qty }}</h5>
+                <h5>{{ products.qty }}</h5>
               </div>
             </div>
             <div class="payment-body-items-right-summary-overview">
@@ -135,7 +154,7 @@ const placeOrder = async () => {
       <Footer />
     </div>
   </div>
-  <div v-loading.fullscreen.lock="store.getters.status === 'loading'" />
+  <div v-loading.fullscreen.lock="loading === true" />
 </template>
 
 <style lang="scss">
@@ -294,6 +313,18 @@ const placeOrder = async () => {
               display: flex;
               flex-direction: column;
               gap: 10px;
+
+              &-qty {
+                background-color: black;
+                color: white;
+                padding: 7px;
+                text-align: center;
+                height: 27px;
+                width: 27px;
+                font-weight: 600;
+                border-radius: 27px;
+                font-size: $base-font-l;
+              }
 
               &-name {
                 inline-size: 250px;

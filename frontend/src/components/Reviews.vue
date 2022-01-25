@@ -129,7 +129,7 @@ sum.value = (sum.value /= reviews.value.length).toFixed(1)
     font-family: "Lilita One", cursive;
     font-size: $base-font-m;
     padding: $base-padding;
-    margin-bottom: 100px;
+    margin-bottom: 50px;
   }
 
   &-ratings {

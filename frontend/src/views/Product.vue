@@ -49,7 +49,9 @@ const addCart = () => {
       <div class="product-body-bc-img">
         <el-breadcrumb separator="/">
           <el-breadcrumb-item :to="{ path: '/' }">Home</el-breadcrumb-item>
-          <el-breadcrumb-item :to="{ path: '/products' }">Products</el-breadcrumb-item>
+          <el-breadcrumb-item
+            :to="{ path: `/products/${product.category}` }"
+          >{{ product.category.charAt(0).toUpperCase() + product.category.slice(1, product.category.lenght) }}</el-breadcrumb-item>
           <el-breadcrumb-item>{{ product.brand }}</el-breadcrumb-item>
         </el-breadcrumb>
         <div
@@ -74,22 +76,24 @@ const addCart = () => {
         <div class="product-body-items-info">{{ product.info }}</div>
       </div>
     </div>
-    <el-alert
-      v-if="showError"
-      title="Please select a flavor"
-      type="error"
-      show-icon
-      effect="dark"
-      center
-    ></el-alert>
-    <el-alert
-      v-if="showSuccess"
-      title="Added to your cart"
-      type="success"
-      show-icon
-      effect="dark"
-      center
-    ></el-alert>
+    <div class="product-body-alert">
+      <el-alert
+        v-if="showError"
+        title="Please select a flavor"
+        type="error"
+        show-icon
+        effect="dark"
+        center
+      ></el-alert>
+      <el-alert
+        v-if="showSuccess"
+        title="Added to your cart"
+        type="success"
+        show-icon
+        effect="dark"
+        center
+      ></el-alert>
+    </div>
     <div v-if="product.qty !== 0" class="product-bar">
       <div class="product-bar-price">${{ product.price }}</div>
       <div class="product-bar-size">{{ product.servings }} Servings</div>
@@ -115,7 +119,6 @@ const addCart = () => {
       <Footer />
     </div>
   </div>
-  <div v-loading.fullscreen.lock="store.getters.status === 'loading'" />
 </template>
 
 <style lang="scss">
@@ -126,10 +129,15 @@ const addCart = () => {
   flex-direction: column;
 
   &-body {
-    margin: 50px 0 150px 0;
+    margin: 50px 0 50px 0;
     display: flex;
     flex-direction: row;
     justify-content: center;
+
+    &-alert {
+      width: 1382px;
+      align-self: center;
+    }
 
     &-bc-img {
       display: flex;
@@ -170,11 +178,14 @@ const addCart = () => {
     flex-direction: row;
     justify-content: center;
     gap: 50px;
-    align-items: center;
     padding: 25px;
     padding-bottom: 50px;
     background-color: $primary-color;
-    margin-bottom: 150px;
+    margin-bottom: 50px;
+    box-shadow: $base-shadow;
+    width: 1333px;
+    align-items: center;
+    align-self: center;
 
     h1 {
       font-family: "Lilita One", cursive;
@@ -185,13 +196,12 @@ const addCart = () => {
     &-price,
     &-size {
       padding: $base-padding;
-      color: black;
-      margin-top: 25px;
-      background-color: rgb(255, 255, 255);
-      border-radius: 10px;
-      border: 5px solid black;
-      font-family: "Lilita One", cursive;
+      color: rgb(255, 255, 255);
+      margin-top: 30px;
+      border-radius: 5px;
+      background-color: black;
       font-size: $base-font-m;
+      font-family: "Lilita One", cursive;
     }
 
     &-flavor,
@@ -211,11 +221,11 @@ const addCart = () => {
       padding: 25px;
       font-size: $base-font-m;
       font-weight: bold;
-      background-color: rgb(0, 0, 0);
+      background-color: black;
       text-align: center;
       margin-top: 30px;
-      box-shadow: $base-shadow;
       border: none;
+      box-shadow: $base-shadow;
 
       &:hover {
         background-color: $dark;

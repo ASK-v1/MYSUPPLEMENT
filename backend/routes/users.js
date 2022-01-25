@@ -55,12 +55,13 @@ router.delete('/address/delete/:userId/:addr', async (req, res) => {
 })
 
 router.put('/order', async (req, res) => {
-  const { userId, order, address } = req.body
+  const { userId, order, address, date } = req.body
   const data = {
     order: order,
-    address: address
+    address: address,
+    date: date
   }
-  await User.updateOne({ _id: userId }, { $push: { orderHistory: [data] }})
+  await User.updateOne({ _id: userId }, { $push: { orderHistory: data }})
   res.send()
 })
 
@@ -77,4 +78,15 @@ router.put('/select', async (req, res) => {
   res.send()
 })
 
+router.put('/admin', async (req, res) => {
+  const { order, address, date } = req.body
+  const admin = 'admin@gmail.com'
+  const data = {
+    order: order,
+    address: address,
+    date: date
+  }
+  await User.updateOne({ email: admin }, { $push: { orderHistory: data }})
+  res.send()
+})
 module.exports = router

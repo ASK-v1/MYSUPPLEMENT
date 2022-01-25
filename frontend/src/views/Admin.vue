@@ -1,18 +1,24 @@
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import store from '../store'
 import router from '../router'
 
 const order = ref(false)
 const products = ref(true)
 
-const switchOrder = () => {
-  order.value = true
-  products.value = false
-}
-const switchProducts = () => {
-  products.value = true
-  order.value = false
+onMounted(() => {
+  (async () => {
+    try {
+      await store.dispatch('getAddress', store.getters.user._id)
+    } catch (error) {
+      console.log(error)
+    }
+  })()
+})
+
+const switchOrderAddress = () => {
+  order.value = !order.value
+  products.value = !products.value
 }
 
 const addProduct = reactive({
@@ -49,13 +55,9 @@ const deleteProduct = async (param) => {
   }
 }
 
-const logout = async () => {
-  try {
-    await store.dispatch('logoutUser')
-    router.push('/')
-  } catch (error) {
-    console.log(error)
-  }
+const logout = () => {
+  store.dispatch('logoutUser')
+  router.push('/')
 }
 </script>
 
@@ -66,14 +68,74 @@ const logout = async () => {
     </div>
     <div class="admin-buttons">
       <button v-if="products" class="products-active">PRODUCTS</button>
-      <button v-if="!products" @click="switchProducts">PRODUCTS</button>
+      <button v-if="!products" @click="switchOrderAddress">PRODUCTS</button>
       <button v-if="order" class="order-active">ORDER LIST</button>
-      <button v-if="!order" @click="switchOrder">ORDER LIST</button>
+      <button v-if="!order" @click="switchOrderAddress">ORDER LIST</button>
       <button @click="logout">LOGOUT</button>
     </div>
     <div class="order-products">
       <div v-if="order" class="order">
-        <h1>order list</h1>
+        <h3 v-if="!store.getters.user">You don't have any orders yet!</h3>
+        <div v-for="items in store.getters.user.orderHistory.reverse()" :key="items" class="order-items">
+          <div class="order-date">
+            <h3>{{ items.date }}</h3>
+          </div>
+          <div v-for="order in items.order" :key="order">
+            <div class="order-items-upper">
+              <img class="order-items-upper-image" :src="order.img" width="100" height="100" />
+              <div class="order-items-upper-mid">
+                <div class="order-items-upper-mid-brand">
+                  <h4>{{ order.brand }}</h4>
+                </div>
+                <div class="order-items-upper-mid-name">{{ order.name }}</div>
+              </div>
+              <div class="order-items-upper-qty">
+                <h5>{{ order.qty }}</h5>
+              </div>
+            </div>
+          </div>
+          <div class="order-items-overview">
+            <div class="order-items-overview-item">
+              <h3>OVERVIEW</h3>
+              <h4>{{ items.order.length }} ITEMS</h4>
+            </div>
+            <div class="order-items-overview-subtotal">
+              <h5>SUBTOTAL</h5>
+              <h5>${{ parseFloat(items.order[0].totalPrice).toFixed(2) }}</h5>
+            </div>
+            <div class="order-items-overview-delivery">
+              <h5>DELIVERY COST</h5>
+              <h5>$20</h5>
+            </div>
+            <div class="order-items-overview-ordertotal">
+              <h3>ORDER TOTAL</h3>
+              <h4>${{ (parseFloat(items.order[0].totalPrice) + 20).toFixed(2) }}</h4>
+            </div>
+          </div>
+          <div class="order-items-address">
+            <div class="order-items-address-title">{{ items.address.addressTitle }}</div>
+            <div class="order-items-address-name">
+              <h3>First Name:</h3>
+              <h4>{{ items.address.firstName }}</h4>
+            </div>
+            <div class="order-items-address-name">
+              <h3>Last Name:</h3>
+              <h4>{{ items.address.lastName.toUpperCase() }}</h4>
+            </div>
+            <div class="order-items-address-phone">
+              <h3>Phone:</h3>
+              <h4>{{ items.address.phone }}</h4>
+            </div>
+            <div class="order-items-address-address">
+              <h3>Address:</h3>
+              <h4>{{ items.address.address }}</h4>
+            </div>
+            <div class="order-items-address-country">
+              <h3>Country:</h3>
+              <h4>{{ items.address.country }}</h4>
+            </div>
+          </div>
+        </div>
       </div>
       <div v-if="products" class="products">
         <button class="products-button" @click="addProduct.dialogFormVisible = true">ADD NEW</button>
@@ -137,7 +199,6 @@ const logout = async () => {
       </div>
     </div>
   </div>
-  <div v-loading.fullscreen.lock="store.getters.status === 'loading'" />
 </template>
 
 <style lang="scss">
@@ -194,7 +255,123 @@ const logout = async () => {
     }
   }
   .order-products {
-    .order,
+    .order {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px;
+      width: 800px;
+      background-color: white;
+      margin-top: 60px;
+      gap: 30px;
+      border-radius: $base-radius;
+
+      &-date {
+        background-color: $dark;
+        padding: 5px;
+        margin-bottom: 5px;
+        border-top-right-radius: $base-radius;
+        border-top-left-radius: $base-radius;
+        color: rgb(255, 255, 255);
+        font-weight: bolder;
+        font-family: "Lilita One", cursive;
+      }
+
+      &-items {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid $dark;
+        gap: 40px;
+        border-radius: $base-radius;
+        inline-size: 500px;
+        text-align: center;
+
+        &-address {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          padding: $base-padding;
+
+          &-title {
+            display: flex;
+            color: $primary-color;
+            font-family: "Lilita One", cursive;
+            font-size: $base-font-m;
+            padding: 7px;
+            margin-bottom: 10px;
+            align-self: center;
+          }
+
+          &-name,
+          &-phone,
+          &-country,
+          &-address {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+            color: $dark;
+            font-size: $base-font-s;
+
+            h3 {
+              color: black;
+            }
+          }
+        }
+
+        &-upper {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          margin: 0 10px 0 10px;
+
+          &-mid {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+
+            &-brand {
+              color: rgb(0, 0, 0);
+              font-family: "Lilita One", cursive;
+              font-size: $base-font-s;
+            }
+          }
+
+          &-qty {
+            background-color: black;
+            color: white;
+            padding: 7px;
+            height: 27px;
+            width: 27px;
+            font-weight: 600;
+            border-radius: 27px;
+            font-size: $base-font-l;
+            margin-top: 10px;
+          }
+        }
+
+        &-overview {
+          padding: $base-padding;
+          background-color: $primary-color;
+          color: white;
+          font-weight: bolder;
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+
+          & > * {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 60px;
+          }
+        }
+      }
+    }
+
     .products {
       display: flex;
       flex-direction: column;
